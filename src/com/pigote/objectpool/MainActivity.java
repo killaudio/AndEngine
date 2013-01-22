@@ -14,17 +14,15 @@ import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.ui.activity.BaseGameActivity;
 
+import android.view.KeyEvent;
+
 
 public class MainActivity extends BaseGameActivity {
 
 	private static final int CAMERA_WIDTH = 960;
     private static final int CAMERA_HEIGHT = 540;
-    
-    private ResourcesManager resourcesManager;
     private Camera camera;
-    private BaseScene splashScene;
-    
-    
+        
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		camera = new Camera (0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -40,15 +38,13 @@ public class MainActivity extends BaseGameActivity {
 			OnCreateResourcesCallback pOnCreateResourcesCallback)
 			throws IOException {
 		ResourcesManager.prepareManager(mEngine, this, camera, getVertexBufferObjectManager());
-		resourcesManager = ResourcesManager.getInstance();
 		pOnCreateResourcesCallback.onCreateResourcesFinished();		
 	}
 
 	@Override
 	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback)
 			throws IOException {
-		createSplashScene();
-		pOnCreateSceneCallback.onCreateSceneFinished(this.splashScene);		
+		SceneManager.getInstance().createSplashScene(pOnCreateSceneCallback);		
 	}
 
 	@Override
@@ -59,28 +55,31 @@ public class MainActivity extends BaseGameActivity {
 			 public void onTimePassed(final TimerHandler pTimerHandler) 
 	            {
 	                mEngine.unregisterUpdateHandler(pTimerHandler);
-	                // load menu resources, create menu scene
-	                // set menu scene using scene manager
-	                disposeSplashScene();
+	                SceneManager.getInstance().createMenuScene();
 	            }
 		}));
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
 	}
 	
-	public Engine OnCreateEngine(EngineOptions pEngineOptions) {
-		return new LimitedFPSEngine(pEngineOptions, 60);
-	}
-
-	private void createSplashScene(){
-		resourcesManager.loadSplashScreen();
-		splashScene = new SplashScene();
+	@Override
+	protected void onDestroy()
+	{
+	    super.onDestroy();
+	    System.exit(0);
 	}
 	
-	private void disposeSplashScene()
-	{
-	    resourcesManager.unloadSplashScreen();
-	    splashScene.disposeScene();
-	    splashScene = null;
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) 
+	{  
+	    if (keyCode == KeyEvent.KEYCODE_BACK)
+	    {
+	        SceneManager.getInstance().getCurrentScene().onBackKeyPressed();
+	    }
+	    return false; 
+	}
+	
+	public Engine OnCreateEngine(EngineOptions pEngineOptions) { 
+		return new LimitedFPSEngine(pEngineOptions, 60);
 	}
 
 }

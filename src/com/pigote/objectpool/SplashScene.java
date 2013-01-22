@@ -21,8 +21,8 @@ public class SplashScene extends BaseScene{
 		       pGLState.enableDither();
 		    }
 		};
-		
-		splash.setPosition(480, 270);
+		splash.setPosition((CAMERA_WIDTH/2)-(resourcesManager.splash_region.getWidth()/2),
+				(CAMERA_HEIGHT/2)-(resourcesManager.splash_region.getHeight()/2));
 		attachChild(splash);
 	}
 
@@ -31,7 +31,7 @@ public class SplashScene extends BaseScene{
 		// TODO Auto-generated method stub
 		
 	}
-
+ 
 	@Override
 	public SceneType getSceneType() {
 		
