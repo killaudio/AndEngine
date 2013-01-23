@@ -72,12 +72,12 @@ public abstract class ObjectPool {
 		}
 		// no objects available
 		// create object if maxObjects hasn't been reached
-		if((unlocked.size()+locked.size()) > maxObjects) {
+		//if((unlocked.size()+locked.size()) > maxObjects) {
 			o = create();        
 			locked.put(o, new Long(now)); 
-		} else {
-			o=null;
-		}
+		//} else {
+		//	o=null;
+		//}
 		return(o);
 	}
 	

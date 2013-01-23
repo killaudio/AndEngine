@@ -91,7 +91,13 @@ public class SceneManager
         setScene(menuScene);
         disposeSplashScene();
     }
-        
+    
+    public void createGameScene()
+    {
+        ResourcesManager.getInstance().loadGameResources();
+        gameScene = new GameScene();
+        setScene(gameScene);
+    }
     //---------------------------------------------
     // GETTERS AND SETTERS
     //---------------------------------------------

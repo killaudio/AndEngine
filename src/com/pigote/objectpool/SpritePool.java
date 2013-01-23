@@ -4,20 +4,18 @@ public class SpritePool extends ObjectPool {
 
 	@Override
 	Object create() {
-		// TODO Auto-generated method stub
-		return null;
+		SpriteResource sprite = new SpriteResource();
+		return sprite;
 	}
 
 	@Override
 	boolean validate(Object o) {
-		// TODO Auto-generated method stub
-		return false;
+		return (((SpriteResource)o).isValid());
 	}
 
 	@Override
 	void expire(Object o) {
-		// TODO Auto-generated method stub
-		
+		o = null;		
 	}
 	
 	public SpritePool(){
