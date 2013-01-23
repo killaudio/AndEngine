@@ -2,6 +2,7 @@ package com.pigote.objectpool;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.sprite.AnimatedSprite;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
@@ -31,7 +32,6 @@ public class SpriteResource {
 	}
 
 	public AnimatedSprite getSprite() {
-		// TODO Auto-generated method stub
 		return sprite;
 	}
 	
@@ -41,6 +41,12 @@ public class SpriteResource {
 		regSprite = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(texSprite,
 				ResourcesManager.getInstance().activity.getAssets(),"spr_banana.png", 0, 0, SPR_COLUMN, SPR_ROWS);
 		texSprite.load();
-		sprite = new AnimatedSprite(0, 0, regSprite, ResourcesManager.getInstance().vbom);
+		sprite = new AnimatedSprite(100, 100, regSprite, ResourcesManager.getInstance().vbom){
+			@Override
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+				this.setPosition(pSceneTouchEvent.getX() - this.getWidth() / 2, pSceneTouchEvent.getY() - this.getHeight() / 2);
+				return true;
+			}
+		};
 	}
 }

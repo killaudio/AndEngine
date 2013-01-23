@@ -16,13 +16,17 @@ public class GameScene extends BaseScene{
 		spritePool = new SpritePool();
 		sr = spritePool.borrowResource();
 		AnimatedSprite as = sr.getSprite();
+		as.setScale(3, 3);
 		this.attachChild(as);
 		as.animate(100);
+		this.registerTouchArea(as);
+		this.setTouchAreaBindingOnActionDownEnabled(true);
 	}
 
 	@Override
 	public void onBackKeyPressed() {
-		SceneManager.getInstance().setScene(SceneType.SCENE_MENU);
+		//SceneManager.getInstance().setScene(SceneType.SCENE_MENU);
+		System.exit(0);
 	}
 
 	@Override
