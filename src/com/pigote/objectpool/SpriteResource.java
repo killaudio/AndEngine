@@ -36,7 +36,8 @@ public class SpriteResource {
 	}
 	
 	private void loadSprite(){
-		texSprite = new BitmapTextureAtlas(textureManager, 256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		//texSprite = new BitmapTextureAtlas(textureManager, 256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		texSprite = new BitmapTextureAtlas(textureManager, 256, 128, TextureOptions.NEAREST_PREMULTIPLYALPHA);
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		regSprite = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(texSprite,
 				ResourcesManager.getInstance().activity.getAssets(),"spr_banana.png", 0, 0, SPR_COLUMN, SPR_ROWS);
