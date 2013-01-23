@@ -36,9 +36,12 @@ public class ResourcesManager
     public ITextureRegion menu_background_region;
     public ITextureRegion play_region;
     public ITextureRegion options_region;
+    public ITextureRegion game_background_region;
+    public ITextureRegion getResource_region;
     
     private BitmapTextureAtlas splashTextureAtlas;
     private BuildableBitmapTextureAtlas menuTextureAtlas;
+    private BuildableBitmapTextureAtlas gameTextureAtlas;
     
     //---------------------------------------------
     // TEXTURES & TEXTURE REGIONS
@@ -88,7 +91,20 @@ public class ResourcesManager
 
     private void loadGameGraphics()
     {
-        
+    	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/game/");
+    	gameTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.BILINEAR);
+    	game_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "game_background.png");
+    	getResource_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "getRes.png");
+    	       
+    	try 
+    	{
+    	    this.gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
+    	    this.gameTextureAtlas.load();
+    	} 
+    	catch (final TextureAtlasBuilderException e)
+    	{
+    	        Debug.e(e);
+    	}
     }
     
     private void loadGameFonts()
