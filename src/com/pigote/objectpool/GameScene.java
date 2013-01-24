@@ -72,14 +72,16 @@ public class GameScene extends BaseScene{
 		
 		final Text poolCount = new Text(250, 240, ResourcesManager.getInstance().font, 
 				"Objects in pool:", "Objects in pool: XXXX".length(), ResourcesManager.getInstance().vbom);
-
+		
+		this.attachChild(poolCount);
+		this.attachChild(getResourcesButton);
+		
 		this.registerUpdateHandler(new TimerHandler(1 / 20.0f, true, new ITimerCallback() {
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler) {
 				poolCount.setText("Objects in pool: "+ResourcesManager.getInstance().spritePool.getObjectCount());
 			}
 		}));
-		this.attachChild(poolCount);
-		this.attachChild(getResourcesButton);
+
 	}
 }

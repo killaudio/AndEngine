@@ -16,6 +16,8 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.debug.Debug;
 
+import android.graphics.Color;
+
 import com.pigote.objectpool.MainActivity;
 
 public class ResourcesManager
@@ -122,7 +124,7 @@ public class ResourcesManager
     private void loadMenuFonts(){
     	FontFactory.setAssetBasePath("font/");
         final ITexture mainFontTexture = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        font = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 50, true, 20, 20, 20);
+        font = FontFactory.createFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 50, true, Color.BLACK);
         font.load();
     }
     
