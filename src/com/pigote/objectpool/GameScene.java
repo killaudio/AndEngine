@@ -59,6 +59,7 @@ public class GameScene extends BaseScene{
 				if (pSceneTouchEvent.isActionUp()){
 					this.setAlpha(0.4f);
 					ResourcesManager.getInstance().spritePool.borrowResource(SceneManager.getInstance().getCurrentScene());
+					this.setAlpha(1);
 				}
 				return true;
 			}

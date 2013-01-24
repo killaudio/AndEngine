@@ -6,7 +6,7 @@ public class SpritePool extends ObjectPool {
 	Object create() {
 		
 		SpriteResource sprite = new SpriteResource();
-		//2 seconds delay TODO
+		for (float x = 0; x<2000000; x++);
 		return sprite;
 	}
 
