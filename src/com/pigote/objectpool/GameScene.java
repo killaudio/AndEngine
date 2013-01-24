@@ -1,9 +1,12 @@
 package com.pigote.objectpool;
 
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.util.GLState;
 import org.andengine.util.color.Color;
@@ -64,8 +67,19 @@ public class GameScene extends BaseScene{
 				return true;
 			}
 		};
-		this.attachChild(getResourcesButton);
 		this.registerTouchArea(getResourcesButton);
 		this.setTouchAreaBindingOnActionDownEnabled(true);
+		
+		final Text poolCount = new Text(250, 240, ResourcesManager.getInstance().font, 
+				"Objects in pool:", "Objects in pool: XXXX".length(), ResourcesManager.getInstance().vbom);
+
+		this.registerUpdateHandler(new TimerHandler(1 / 20.0f, true, new ITimerCallback() {
+			@Override
+			public void onTimePassed(final TimerHandler pTimerHandler) {
+				poolCount.setText("Objects in pool: "+ResourcesManager.getInstance().spritePool.getObjectCount());
+			}
+		}));
+		this.attachChild(poolCount);
+		this.attachChild(getResourcesButton);
 	}
 }

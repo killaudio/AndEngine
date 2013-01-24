@@ -34,7 +34,9 @@ public abstract class ObjectPool {
 	//---------------------------------------------
     // METHODS
     //---------------------------------------------
-
+	public int getObjectCount(){
+		return (this.locked.size()+this.unlocked.size());
+	}
 	synchronized Object checkOut(){
 		
 		long now = System.currentTimeMillis();
