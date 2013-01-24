@@ -22,6 +22,7 @@ public class MainActivity extends BaseGameActivity {
 	private static final int CAMERA_WIDTH = 960;
     private static final int CAMERA_HEIGHT = 540;
     private Camera camera;
+    private SpritePool spritePool;
         
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -37,7 +38,7 @@ public class MainActivity extends BaseGameActivity {
 	public void onCreateResources(
 			OnCreateResourcesCallback pOnCreateResourcesCallback)
 			throws IOException {
-		ResourcesManager.prepareManager(mEngine, this, camera, getVertexBufferObjectManager());
+		ResourcesManager.prepareManager(mEngine, this, camera, getVertexBufferObjectManager(), spritePool );
 		pOnCreateResourcesCallback.onCreateResourcesFinished();		
 	}
 
@@ -56,7 +57,6 @@ public class MainActivity extends BaseGameActivity {
 	            {
 	                mEngine.unregisterUpdateHandler(pTimerHandler);
 	                SceneManager.getInstance().createMenuScene();
-	                //SceneManager.getInstance().createGameScene();
 	            }
 		}));
 		pOnPopulateSceneCallback.onPopulateSceneFinished();

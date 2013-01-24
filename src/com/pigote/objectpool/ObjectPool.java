@@ -17,7 +17,7 @@ public abstract class ObjectPool {
     
 	public ObjectPool()
 	{
-		expirationTime = 30000; // 30 seconds
+		expirationTime = 10000; // 10 seconds
 		locked = new Hashtable();         
 		unlocked = new Hashtable();
 		maxObjects = 20;

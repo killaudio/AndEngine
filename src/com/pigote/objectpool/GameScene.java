@@ -12,7 +12,6 @@ import com.pigote.objectpool.SceneManager.SceneType;
 
 public class GameScene extends BaseScene{
 	
-	private SpritePool spritePool;
 	private SpriteResource sr;
 	private Sprite getResourcesButton;
 	
@@ -57,21 +56,15 @@ public class GameScene extends BaseScene{
 				resourcesManager.getResource_region, ResourcesManager.getInstance().vbom){
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-				this.setAlpha(0.4f);
-				this.setAlpha(1.0f);
+				if (pSceneTouchEvent.isActionUp()){
+					this.setAlpha(0.4f);
+					ResourcesManager.getInstance().spritePool.borrowResource(SceneManager.getInstance().getCurrentScene());
+				}
 				return true;
 			}
 		};
-		
-		spritePool = new SpritePool();
-		sr = spritePool.borrowResource();
-		AnimatedSprite as = sr.getSprite();
-		as.setScale(3, 3);
-		this.attachChild(as);
 		this.attachChild(getResourcesButton);
-		as.animate(100);
-		this.registerTouchArea(as);
 		this.registerTouchArea(getResourcesButton);
-		this.setTouchAreaBindingOnActionDownEnabled(true);		
+		this.setTouchAreaBindingOnActionDownEnabled(true);
 	}
 }

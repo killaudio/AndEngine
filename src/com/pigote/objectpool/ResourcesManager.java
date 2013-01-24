@@ -31,6 +31,7 @@ public class ResourcesManager
     public Camera camera;
     public VertexBufferObjectManager vbom;
     public Font font;
+    public SpritePool spritePool;
     
     public ITextureRegion splash_region;
     public ITextureRegion menu_background_region;
@@ -38,7 +39,7 @@ public class ResourcesManager
     public ITextureRegion options_region;
     public ITextureRegion game_background_region;
     public ITextureRegion getResource_region;
-    
+        
     private BitmapTextureAtlas splashTextureAtlas;
     private BuildableBitmapTextureAtlas menuTextureAtlas;
     private BuildableBitmapTextureAtlas gameTextureAtlas;
@@ -91,6 +92,7 @@ public class ResourcesManager
 
     private void loadGameGraphics()
     {
+    	ResourcesManager.getInstance().spritePool = new SpritePool();
     	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/game/");
     	gameTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.BILINEAR);
     	game_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "game_background.png");
@@ -143,16 +145,18 @@ public class ResourcesManager
      * @param activity
      * @param camera
      * @param vbom
+     * @param spritePool
      * <br><br>
      * We use this method at beginning of game loading, to prepare Resources Manager properly,
      * setting all needed parameters, so we can latter access them from different classes (eg. scenes)
      */
-    public static void prepareManager(Engine engine, MainActivity activity, Camera camera, VertexBufferObjectManager vbom)
+    public static void prepareManager(Engine engine, MainActivity activity, Camera camera, VertexBufferObjectManager vbom, SpritePool spritePool)
     {
         getInstance().engine = engine;
         getInstance().activity = activity;
         getInstance().camera = camera;
         getInstance().vbom = vbom;
+        getInstance().spritePool = spritePool;
     }
     
     //---------------------------------------------

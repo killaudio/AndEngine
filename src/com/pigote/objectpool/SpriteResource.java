@@ -1,6 +1,5 @@
 package com.pigote.objectpool;
 
-import org.andengine.entity.IEntity;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.TextureManager;
@@ -9,7 +8,7 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 
-public class SpriteResource {
+public class SpriteResource{
 	
 	private BitmapTextureAtlas texSprite;
 	private TiledTextureRegion regSprite;
@@ -42,12 +41,20 @@ public class SpriteResource {
 		regSprite = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(texSprite,
 				ResourcesManager.getInstance().activity.getAssets(),"spr_banana.png", 0, 0, SPR_COLUMN, SPR_ROWS);
 		texSprite.load();
-		sprite = new AnimatedSprite(100, 100, regSprite, ResourcesManager.getInstance().vbom){
+		float x, y;
+		x=(float)Math.ceil(Math.random()*(BaseScene.CAMERA_WIDTH-regSprite.getWidth()));
+		y=(float)Math.ceil(Math.random()*(BaseScene.CAMERA_HEIGHT-ResourcesManager.getInstance().getResource_region.getHeight()-regSprite.getHeight()));
+		
+		sprite = new AnimatedSprite(x,y, regSprite, ResourcesManager.getInstance().vbom){
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-				this.setPosition(pSceneTouchEvent.getX() - this.getWidth() / 2, pSceneTouchEvent.getY() - this.getHeight() / 2);
+				returnRes();
 				return true;
 			}
 		};
+	}
+
+	protected void returnRes() {
+		ResourcesManager.getInstance().spritePool.returnResource(this, SceneManager.getInstance().getCurrentScene());		
 	}
 }

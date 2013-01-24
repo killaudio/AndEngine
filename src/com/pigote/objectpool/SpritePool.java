@@ -4,7 +4,9 @@ public class SpritePool extends ObjectPool {
 
 	@Override
 	Object create() {
+		
 		SpriteResource sprite = new SpriteResource();
+		//2 seconds delay TODO
 		return sprite;
 	}
 
@@ -22,12 +24,18 @@ public class SpritePool extends ObjectPool {
 		//initialize a couple of objects, etc
 	}
 	
-	public SpriteResource borrowResource()
+	public void borrowResource(BaseScene scene)
 	{
-	   return((SpriteResource) super.checkOut());
+		SpriteResource sr;
+		sr = (SpriteResource) super.checkOut();
+		scene.attachChild(sr.getSprite());
+		sr.getSprite().animate(100);
+		scene.registerTouchArea(sr.getSprite());
 	}
-	public void returnResource(SpriteResource c)
+	
+	public void returnResource(SpriteResource c, BaseScene scene)
 	{
-	   super.checkIn(c);
+		scene.detachChild(c.getSprite());
+		super.checkIn(c);
 	}
 }
