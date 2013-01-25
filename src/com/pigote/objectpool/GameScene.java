@@ -60,13 +60,13 @@ public class GameScene extends BaseScene{
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				if (pSceneTouchEvent.isActionUp()){
-					this.setAlpha(0.4f);
+					
 					ResourcesManager.getInstance().spritePool.borrowResource(SceneManager.getInstance().getCurrentScene());
-					this.setAlpha(1);
 				}
 				return true;
 			}
 		};
+		getResourcesButton.setAlpha(0.5f);
 		this.registerTouchArea(getResourcesButton);
 		this.setTouchAreaBindingOnActionDownEnabled(true);
 		
@@ -79,9 +79,14 @@ public class GameScene extends BaseScene{
 		this.registerUpdateHandler(new TimerHandler(1 / 20.0f, true, new ITimerCallback() {
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler) {
+				ResourcesManager.getInstance().spritePool.clean();
 				poolCount.setText("Objects in pool: "+ResourcesManager.getInstance().spritePool.getObjectCount());
 			}
 		}));
 
+	}
+	
+	public void setResourcesButtonAlpha(float pAlpha){
+		this.getResourcesButton.setAlpha(pAlpha);
 	}
 }

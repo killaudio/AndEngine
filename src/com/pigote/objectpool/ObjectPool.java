@@ -17,7 +17,7 @@ public abstract class ObjectPool {
     
 	public ObjectPool()
 	{
-		expirationTime = 10000; // 10 seconds
+		expirationTime = 5000; // 5 seconds
 		locked = new Hashtable();         
 		unlocked = new Hashtable();
 		maxObjects = 20;
@@ -47,15 +47,15 @@ public abstract class ObjectPool {
 			while(e.hasMoreElements())
 			{
 				o = e.nextElement();           
-				if((now - ((Long)unlocked.get(o)).longValue()) > expirationTime)
-				{
-					// object has expired
-					unlocked.remove(o);
-					expire(o);
-					o = null;
-				}
-				else
-				{
+//				if((now - ((Long)unlocked.get(o)).longValue()) > expirationTime)
+//				{
+//					// object has expired
+//					unlocked.remove(o);
+//					expire(o);
+//					o = null;
+//				}
+//				else
+//				{
 					if( validate(o))
 					{
 			       		unlocked.remove(o);
@@ -69,7 +69,7 @@ public abstract class ObjectPool {
 			            expire(o);
 			            o = null;
 					}
-				}
+//				}
 			}
 		}
 		// no objects available
@@ -86,6 +86,23 @@ public abstract class ObjectPool {
 	synchronized void checkIn(Object o){
 		locked.remove(o);
 		unlocked.put(o, new Long(System.currentTimeMillis()));
+	}
+	
+	synchronized void clean(){
+		long now = System.currentTimeMillis();
+		Object o;
+		Enumeration e = unlocked.keys();  
+		while(e.hasMoreElements())
+		{
+			o = e.nextElement();           
+			if((now - ((Long)unlocked.get(o)).longValue()) > expirationTime)
+			{
+				// object has expired
+				unlocked.remove(o);
+				expire(o);
+				o = null;
+			}
+		}
 	}
     
 }
