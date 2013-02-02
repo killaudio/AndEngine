@@ -74,6 +74,7 @@ public class SceneManager
     {
         ResourcesManager.getInstance().loadSplashScreen();
         splashScene = new SplashScene();
+        currentScene = splashScene;
         pOnCreateSceneCallback.onCreateSceneFinished(splashScene);
     }
     
@@ -89,7 +90,6 @@ public class SceneManager
         ResourcesManager.getInstance().loadMenuResources();
         menuScene = new MainMenuScene();
         loadingScene = new LoadingScene();
-        //setScene(loadingScene);
         setScene(menuScene);
         disposeSplashScene();
     }

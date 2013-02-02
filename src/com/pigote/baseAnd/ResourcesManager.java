@@ -15,7 +15,6 @@ import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.debug.Debug;
-
 import android.graphics.Color;
 
 import com.pigote.baseAnd.MainActivity;
@@ -43,10 +42,14 @@ public class ResourcesManager
     public ITextureRegion play_region;
     public ITextureRegion options_region;
     public ITextureRegion game_background_region;
-        
+    
+    public ITextureRegion hold1_region;
+    public ITextureRegion hold2_region;
+    
+    public BuildableBitmapTextureAtlas gameTextureAtlas;
+    
     private BitmapTextureAtlas splashTextureAtlas;
     private BuildableBitmapTextureAtlas menuTextureAtlas;
-    private BuildableBitmapTextureAtlas gameTextureAtlas;
     
     //---------------------------------------------
     // CLASS LOGIC
@@ -79,9 +82,11 @@ public class ResourcesManager
     private void loadGameGraphics()
     {
     	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/game/");
-    	gameTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.BILINEAR);
+    	gameTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.NEAREST);
     	game_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "game_background.png");
-    	       
+    	hold1_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "hold1.png");
+    	hold2_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "hold2.png");
+    	
     	try 
     	{
     	    this.gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
@@ -106,10 +111,10 @@ public class ResourcesManager
     private void loadMenuFonts(){
     	FontFactory.setAssetBasePath("font/");
         final ITexture mainFontTexture = new BitmapTextureAtlas(activity.getTextureManager(), 256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-        font = FontFactory.createFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 50, true, Color.BLACK);
+        font = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 50, true, Color.WHITE, 2, Color.BLACK);
         font.load();
     }
-    
+   
     public void loadMenuResources()
     {
         loadMenuGraphics();

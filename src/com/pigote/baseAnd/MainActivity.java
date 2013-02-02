@@ -22,6 +22,7 @@ public class MainActivity extends BaseGameActivity {
 	private static final int CAMERA_WIDTH = 960;
     private static final int CAMERA_HEIGHT = 540;
     private Camera camera;
+    private ResourcesManager resourcesManager;
         
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -38,6 +39,7 @@ public class MainActivity extends BaseGameActivity {
 			OnCreateResourcesCallback pOnCreateResourcesCallback)
 			throws IOException {
 		ResourcesManager.prepareManager(mEngine, this, camera, getVertexBufferObjectManager());
+		resourcesManager = ResourcesManager.getInstance();
 		pOnCreateResourcesCallback.onCreateResourcesFinished();		
 	}
 

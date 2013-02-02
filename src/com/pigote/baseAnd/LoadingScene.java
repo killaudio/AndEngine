@@ -2,7 +2,7 @@ package com.pigote.baseAnd;
 
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.text.Text;
-import org.andengine.util.color.Color;
+import org.andengine.util.adt.color.Color;
 
 import com.pigote.baseAnd.SceneManager.SceneType;
 
@@ -11,7 +11,7 @@ public class LoadingScene extends BaseScene {
 	@Override
 	public void createScene() {
 		setBackground(new Background(Color.WHITE));
-		attachChild(new Text(400, 240, resourcesManager.font, "Loading...", vbom));
+		attachChild(new Text(CAMERA_WIDTH/2, CAMERA_HEIGHT/2, resourcesManager.font, "Loading...", vbom));
 	}
 
 	@Override
