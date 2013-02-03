@@ -15,7 +15,7 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	
 	private MenuScene menuChildScene;
 	private final int MENU_PLAY = 0;
-	private final int MENU_OPTIONS = 1;
+	private final int MENU_EXIT = 1;
 	
 	@Override
 	public void createScene() {
@@ -58,16 +58,16 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	    menuChildScene.setPosition(CAMERA_WIDTH/2, CAMERA_HEIGHT/2);
 	    
 	    final IMenuItem playMenuItem = new ScaleMenuItemDecorator(new SpriteMenuItem(MENU_PLAY, resourcesManager.play_region, vbom), 0.8f, 0.7f);
-	    final IMenuItem optionsMenuItem = new ScaleMenuItemDecorator(new SpriteMenuItem(MENU_OPTIONS, resourcesManager.options_region, vbom), 0.8f, 0.7f);
+	    final IMenuItem exitMenuItem = new ScaleMenuItemDecorator(new SpriteMenuItem(MENU_EXIT, resourcesManager.exit_region, vbom), 0.8f, 0.7f);
 	      
 	    menuChildScene.addMenuItem(playMenuItem);
-	    menuChildScene.addMenuItem(optionsMenuItem);
+	    menuChildScene.addMenuItem(exitMenuItem);
 	    
 	    menuChildScene.buildAnimations();
 	    menuChildScene.setBackgroundEnabled(false);
 	    
 	    playMenuItem.setPosition(0, 0);
-	    optionsMenuItem.setPosition(playMenuItem.getX(), playMenuItem.getY()-110);
+	    exitMenuItem.setPosition(playMenuItem.getX(), playMenuItem.getY()-110);
 	    
 	    menuChildScene.setOnMenuItemClickListener(this);
 	    
@@ -81,7 +81,8 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 		        case MENU_PLAY:
 		        	SceneManager.getInstance().loadGameScene(engine);
 		            return true;
-		        case MENU_OPTIONS:
+		        case MENU_EXIT:
+		        	System.exit(0);
 		        	//SceneManager.getInstance().setScene(SceneType.SCENE_LOADING);
 		            return true;
 		        default:

@@ -40,7 +40,7 @@ public class ResourcesManager
     public ITextureRegion splash_region;
     public ITextureRegion menu_background_region;
     public ITextureRegion play_region;
-    public ITextureRegion options_region;
+    public ITextureRegion exit_region;
     public ITextureRegion game_background_region;
     
     public ITextureRegion hold1_region;
@@ -61,7 +61,7 @@ public class ResourcesManager
     	menuTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.NEAREST);
     	menu_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "menu_background.png");
     	play_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "play.png");
-    	options_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "options.png");
+    	exit_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "exit.png");
     	       
     	try 
     	{
