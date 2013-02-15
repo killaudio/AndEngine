@@ -41,6 +41,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_PLAYER = "player";
     
 	private Player player;
+	private boolean firstTouch = false;
     
     //---------------------------------------------
     // Level loader stuff
@@ -208,7 +209,15 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
 		if (pSceneTouchEvent.isActionDown())
 	    {
-
+			if (!firstTouch)
+		       {
+		           player.setRunning();
+		           firstTouch = true;
+		       }
+		       else
+		       {
+		           player.jump();
+		       }
 	    }
 		return false;
 	}
