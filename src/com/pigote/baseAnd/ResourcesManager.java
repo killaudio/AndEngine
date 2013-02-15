@@ -46,6 +46,8 @@ public class ResourcesManager
     public ITextureRegion hold1_region;
     public ITextureRegion hold2_region;
     
+    public ITextureRegion player_region;
+    
     public BuildableBitmapTextureAtlas gameTextureAtlas;
     
     private BitmapTextureAtlas splashTextureAtlas;
@@ -86,6 +88,7 @@ public class ResourcesManager
     	game_background_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "game_background.png");
     	hold1_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "hold1.png");
     	hold2_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "hold2.png");
+    	player_region = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(gameTextureAtlas, activity, "player.png", 3, 1);
     	
     	try 
     	{

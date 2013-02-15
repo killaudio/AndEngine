@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.scene.IOnSceneTouchListener;
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
@@ -12,6 +14,7 @@ import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.util.GLState;
 import org.andengine.util.SAXUtils;
 import org.andengine.util.adt.align.HorizontalAlign;
@@ -23,11 +26,11 @@ import org.xml.sax.Attributes;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.pigote.baseAnd.SceneManager.SceneType;
 
-public class GameScene extends BaseScene{
+public class GameScene extends BaseScene implements IOnSceneTouchListener{
 	
 	private PhysicsWorld physicsWorld;
 	
@@ -35,6 +38,9 @@ public class GameScene extends BaseScene{
 	private Text scoreText;
 	private int score = 0;
 	
+	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_PLAYER = "player";
+    
+	private Player player;
     
     //---------------------------------------------
     // Level loader stuff
@@ -143,7 +149,19 @@ public class GameScene extends BaseScene{
 //                        }
 //                    };
 //                    levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
-//                }            
+//                }
+                else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_PLAYER))
+                {
+                    player = new Player(x, y, vbom, camera, physicsWorld)
+                    {
+                        @Override
+                        public void onDie()
+                        {
+                            // TODO Latter we will handle it.
+                        }
+                    };
+                    levelObject = player;
+                }
                 else
                 {
                     throw new IllegalArgumentException();
@@ -164,6 +182,7 @@ public class GameScene extends BaseScene{
 	    createHUD();
 	    createPhysics();
 	    loadLevel(1);
+	    setOnSceneTouchListener(this);
 	}
 
 	@Override
@@ -183,6 +202,15 @@ public class GameScene extends BaseScene{
 	    camera.setCenter(CAMERA_WIDTH/2, CAMERA_HEIGHT/2);
 
 	    // removing all game scene objects.
+	}
+
+	@Override
+	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
+		if (pSceneTouchEvent.isActionDown())
+	    {
+
+	    }
+		return false;
 	}
 	
 }
