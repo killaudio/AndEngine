@@ -27,7 +27,12 @@ import org.xml.sax.Attributes;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.pigote.baseAnd.SceneManager.SceneType;
 
 public class GameScene extends BaseScene implements IOnSceneTouchListener{
@@ -42,6 +47,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
     
 	private Player player;
 	private boolean firstTouch = false;
+	
+	private Text gameOverText;
+	private boolean gameOverDisplayed = false;
     
     //---------------------------------------------
     // Level loader stuff
@@ -86,7 +94,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 	private void createPhysics()
 	{
 		//mod gravity vector accordingly to affect gravity(new Vector2(0, -17))
-	    physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0, -17), false); 
+	    physicsWorld = new FixedStepPhysicsWorld(60, new Vector2(0, -17), false);
+	    physicsWorld.setContactListener(contactListener());
 	    registerUpdateHandler(physicsWorld);
 	}
 	
@@ -103,8 +112,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
                 final int width = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_WIDTH);
                 final int height = SAXUtils.getIntAttributeOrThrow(pAttributes, LevelConstants.TAG_LEVEL_ATTRIBUTE_HEIGHT);
                 
-                // TODO later we will specify camera BOUNDS and create invisible walls
-                // on the beginning and on the end of the level.
+                camera.setBounds(0, 0, width, height); // here we set camera bounds
+                camera.setBoundsEnabled(true);
 
                 return GameScene.this;
             }
@@ -141,12 +150,12 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 //                        {
 //                            super.onManagedUpdate(pSecondsElapsed);
 //                            
-//                            /** 
-//                             * TODO
-//                             * we will later check if player collide with this (coin)
-//                             * and if it does, we will increase score and hide coin
-//                             * it will be completed in next articles (after creating player code)
-//                             */
+//					                if (player.collidesWith(this))
+//					                {
+//					                    addToScore(10);
+//					                    this.setVisible(false);
+//					                    this.setIgnoreUpdate(true);
+//					                }
 //                        }
 //                    };
 //                    levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
@@ -158,7 +167,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
                         @Override
                         public void onDie()
                         {
-                            // TODO Latter we will handle it.
+                        	if (!gameOverDisplayed)
+                            {
+                                displayGameOverText();
+                            }
                         }
                     };
                     levelObject = player;
@@ -177,12 +189,72 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
         levelLoader.loadLevelFromAsset(activity.getAssets(), "walls/" + levelID + ".lvl");
     }
 	
+    private void createGameOverText()
+    {
+        gameOverText = new Text(0, 0, resourcesManager.font, "Game Over!", vbom);
+    }
+
+    private void displayGameOverText()
+    {
+        camera.setChaseEntity(null);
+        gameOverText.setPosition(camera.getCenterX(), camera.getCenterY());
+        attachChild(gameOverText);
+        gameOverDisplayed = true;
+    }
+    
+    private ContactListener contactListener()
+    {
+        ContactListener contactListener = new ContactListener()
+        {
+        	//TODO Validate that fixtures equals to player and not HOLD1
+            public void beginContact(Contact contact)
+            {
+                final Fixture x1 = contact.getFixtureA();
+                final Fixture x2 = contact.getFixtureB();
+
+                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
+                {
+                    if (x2.getBody().getUserData().equals("player"))
+                    {
+                        player.increaseFootContacts();
+                    }
+                }
+            }
+
+            public void endContact(Contact contact)
+            {
+                final Fixture x1 = contact.getFixtureA();
+                final Fixture x2 = contact.getFixtureB();
+
+                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
+                {
+                    if (x2.getBody().getUserData().equals("player"))
+                    {
+                        player.decreaseFootContacts();
+                    }
+                }
+            }
+
+            public void preSolve(Contact contact, Manifold oldManifold)
+            {
+
+            }
+
+            public void postSolve(Contact contact, ContactImpulse impulse)
+            {
+
+            }
+        };
+        return contactListener;
+    }
+    
 	@Override
 	public void createScene() {
 	    createBackground();
 	    createHUD();
 	    createPhysics();
 	    loadLevel(1);
+	    createGameOverText();
 	    setOnSceneTouchListener(this);
 	}
 

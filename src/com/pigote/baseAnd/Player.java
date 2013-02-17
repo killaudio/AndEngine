@@ -20,15 +20,8 @@ public abstract class Player  extends AnimatedSprite{
 	    
 	private Body body;
 	private boolean canRun = false;
+	private int footContacts = 0;
 	
-	public Player(float pX, float pY, VertexBufferObjectManager vbo, Camera camera, PhysicsWorld physicsWorld) {
-		super(pX, pY, (ITiledTextureRegion) ResourcesManager.getInstance().player_region, vbo);
-		createPhysics(camera, physicsWorld);
-	    camera.setChaseEntity(this);
-	}
-	
-	public abstract void onDie();
-
 	private void createPhysics(final Camera camera, PhysicsWorld physicsWorld)
 	{        
 	    body = PhysicsFactory.createBoxBody(physicsWorld, this, BodyType.DynamicBody, PhysicsFactory.createFixtureDef(0, 0, 0));
@@ -66,9 +59,30 @@ public abstract class Player  extends AnimatedSprite{
 	    animate(PLAYER_ANIMATE, 0, 2, true);
 	}
 
+	public Player(float pX, float pY, VertexBufferObjectManager vbo, Camera camera, PhysicsWorld physicsWorld) {
+		super(pX, pY, (ITiledTextureRegion) ResourcesManager.getInstance().player_region, vbo);
+		createPhysics(camera, physicsWorld);
+	    camera.setChaseEntity(this);
+	}
+	
+	public abstract void onDie();
+	
 	public void jump()
 	{
+	    if (footContacts < 1) 
+	    {
+	        return; 
+	    }
 	    body.setLinearVelocity(new Vector2(body.getLinearVelocity().x, 12)); 
 	}
 	
+	public void increaseFootContacts()
+	{
+	    footContacts++;
+	}
+
+	public void decreaseFootContacts()
+	{
+	    footContacts--;
+	}
 }
