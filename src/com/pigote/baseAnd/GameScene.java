@@ -206,7 +206,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
     {
         ContactListener contactListener = new ContactListener()
         {
-        	//TODO Validate that fixtures equals to player and not HOLD1
+        	//TODO Validate that fixtures equals to whatever we want to interact with
             public void beginContact(Contact contact)
             {
                 final Fixture x1 = contact.getFixtureA();
@@ -214,7 +214,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
                 {
-                    if (x2.getBody().getUserData().equals("player"))
+                    if (x1.getBody().getUserData().equals("player"))
                     {
                         player.increaseFootContacts();
                     }
@@ -228,7 +228,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
                 {
-                    if (x2.getBody().getUserData().equals("player"))
+                    if (x1.getBody().getUserData().equals("player"))
                     {
                         player.decreaseFootContacts();
                     }
