@@ -43,9 +43,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 	private Text scoreText;
 	private int score = 0;
 	
-	private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_PLAYER = "player";
-    
 	private Player player;
+	private Climber climber;
 	private boolean firstTouch = false;
 	
 	private Text gameOverText;
@@ -62,7 +61,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
         
     private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD1 = "hold1";
     private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD2 = "hold2";
-	
+
 	private void createBackground(){
 		//setBackground(new Background(Color.BLUE));
 		attachChild(new Sprite(CAMERA_WIDTH/2, CAMERA_HEIGHT/2, resourcesManager.game_background_region, vbom)
@@ -160,21 +159,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 //                    };
 //                    levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
 //                }
-                else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_PLAYER))
-                {
-                    player = new Player(x, y, vbom, camera, physicsWorld)
-                    {
-                        @Override
-                        public void onDie()
-                        {
-                        	if (!gameOverDisplayed)
-                            {
-                                displayGameOverText();
-                            }
-                        }
-                    };
-                    levelObject = player;
-                }
                 else
                 {
                     throw new IllegalArgumentException();

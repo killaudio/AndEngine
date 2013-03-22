@@ -47,16 +47,83 @@ public class ResourcesManager
     public ITextureRegion hold1_region;
     public ITextureRegion hold2_region;
     
+    //climber dude
+    public ITextureRegion m_Head;
+    public ITextureRegion m_Torso1;
+    public ITextureRegion m_Torso2;
+    public ITextureRegion m_Torso3;
+    public ITextureRegion m_UpperArmLeft;
+    public ITextureRegion m_UpperArmRight;
+    public ITextureRegion m_LowerArmLeft;
+    public ITextureRegion m_LowerArmRight;
+    public ITextureRegion m_UpperLegLeft;
+    public ITextureRegion m_UpperLegRight;
+    public ITextureRegion m_LowerLegLeft;
+    public ITextureRegion m_LowerLegRight;
+    public ITextureRegion m_DebugTexture;
+    
     public ITextureRegion player_region;
     
-    public BuildableBitmapTextureAtlas gameTextureAtlas;
-    
+    private BuildableBitmapTextureAtlas gameTextureAtlas;
+    private BuildableBitmapTextureAtlas climberTextureAtlas;
     private BitmapTextureAtlas splashTextureAtlas;
     private BuildableBitmapTextureAtlas menuTextureAtlas;
     
     //---------------------------------------------
     // CLASS LOGIC
     //---------------------------------------------
+    
+    public void loadSplashScreen()
+    {
+    	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+    	splashTextureAtlas = new BitmapTextureAtlas(activity.getTextureManager(), 484, 137, TextureOptions.BILINEAR);
+    	splash_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(splashTextureAtlas, activity, "splash.png", 0, 0);
+    	splashTextureAtlas.load();
+    }
+    
+    public void loadMenuResources()
+    {
+        loadMenuGraphics();
+        loadMenuAudio();
+        loadMenuFonts();
+    }
+    
+    public void loadGameResources()
+    {
+        loadGameGraphics();
+        loadGameFonts();
+        loadGameAudio();
+    }
+    
+    public void loadMenuTextures()
+    {
+        menuTextureAtlas.load();
+    }
+    
+    public void unloadSplashScreen()
+    {
+    	splashTextureAtlas.unload();
+    	splash_region = null;
+    }
+    
+    public void unloadGameTextures()
+    {
+    	gameTextureAtlas.unload();
+    	climberTextureAtlas.unload();
+    }
+
+    public void unloadMenuTextures()
+    {
+        menuTextureAtlas.unload();
+    }
+
+    public static void prepareManager(Engine engine, MainActivity activity, BoundCamera camera, VertexBufferObjectManager vbom)
+    {
+        getInstance().engine = engine;
+        getInstance().activity = activity;
+        getInstance().camera = camera;
+        getInstance().vbom = vbom;
+    }
     
     private void loadMenuGraphics()
     {
@@ -77,11 +144,6 @@ public class ResourcesManager
     	}
     }
     
-    private void loadMenuAudio()
-    {
-        
-    }
-
     private void loadGameGraphics()
     {
     	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/game/");
@@ -91,7 +153,24 @@ public class ResourcesManager
     	hold2_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "hold2.png");
     	player_region = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(gameTextureAtlas, activity, "player.png", 3, 1);
     	
-    	try 
+    	//climber
+    	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/climber");
+    	climberTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.NEAREST);
+
+        m_Head = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "head.png");
+        m_Torso1 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "torso1.png");
+        m_Torso2 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "torso2.png");
+        m_Torso3 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "torso3.png");
+        m_UpperArmLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_arm_left.png");
+        m_UpperArmRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_arm_right.png");
+        m_LowerArmLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_arm_left.png");
+        m_LowerArmRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_arm_right.png");
+        m_UpperLegLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_leg_left.png");
+        m_UpperLegRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_leg_right.png");
+        m_LowerLegLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_leg_left.png");
+        m_LowerLegRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_leg_right.png");
+
+        try 
     	{
     	    this.gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
     	    this.gameTextureAtlas.load();
@@ -100,14 +179,24 @@ public class ResourcesManager
     	{
     	        Debug.e(e);
     	}
+    	
+    	try 
+    	{
+    	    this.climberTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
+    	    this.climberTextureAtlas.load();
+    	} 
+    	catch (final TextureAtlasBuilderException e)
+    	{
+    	        Debug.e(e);
+    	}
     }
     
-    private void loadGameFonts()
+    private void loadGameAudio()
     {
         
     }
     
-    private void loadGameAudio()
+    private void loadMenuAudio()
     {
         
     }
@@ -118,66 +207,10 @@ public class ResourcesManager
         font = FontFactory.createStrokeFromAsset(activity.getFontManager(), mainFontTexture, activity.getAssets(), "font.ttf", 50, true, Color.WHITE, 2, Color.BLACK);
         font.load();
     }
-   
-    public void loadMenuResources()
-    {
-        loadMenuGraphics();
-        loadMenuAudio();
-        loadMenuFonts();
-    }
-    
-    public void loadGameResources()
-    {
-        loadGameGraphics();
-        loadGameFonts();
-        loadGameAudio();
-    }
-    
-    public void unloadMenuTextures()
-    {
-        menuTextureAtlas.unload();
-    }
-        
-    public void loadMenuTextures()
-    {
-        menuTextureAtlas.load();
-    }
-    
-    public void loadSplashScreen()
-    {
-    	BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
-    	splashTextureAtlas = new BitmapTextureAtlas(activity.getTextureManager(), 484, 137, TextureOptions.BILINEAR);
-    	splash_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(splashTextureAtlas, activity, "splash.png", 0, 0);
-    	splashTextureAtlas.load();
-    }
-    
-    public void unloadSplashScreen()
-    {
-    	splashTextureAtlas.unload();
-    	splash_region = null;
-    }
-    
-    public void unloadGameTextures()
-    {
-        // TODO (Since we did not create any textures for game scene yet)
-    }
 
-    /**
-     * @param engine
-     * @param activity
-     * @param camera
-     * @param vbom
-     * @param spritePool
-     * <br><br>
-     * We use this method at beginning of game loading, to prepare Resources Manager properly,
-     * setting all needed parameters, so we can latter access them from different classes (eg. scenes)
-     */
-    public static void prepareManager(Engine engine, MainActivity activity, BoundCamera camera, VertexBufferObjectManager vbom)
+    private void loadGameFonts()
     {
-        getInstance().engine = engine;
-        getInstance().activity = activity;
-        getInstance().camera = camera;
-        getInstance().vbom = vbom;
+        
     }
     
     //---------------------------------------------

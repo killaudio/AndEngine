@@ -19,17 +19,15 @@ import android.view.KeyEvent;
 
 
 public class MainActivity extends BaseGameActivity {
-
-	private static final int CAMERA_WIDTH = 960;
-    private static final int CAMERA_HEIGHT = 540;
+	
     private BoundCamera camera;
     private ResourcesManager resourcesManager;
         
 	@Override
 	public EngineOptions onCreateEngineOptions() {
-		camera = new BoundCamera (0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+		camera = new BoundCamera (0, 0, BaseScene.CAMERA_WIDTH, BaseScene.CAMERA_HEIGHT);
 		EngineOptions engineOptions = new EngineOptions(true,ScreenOrientation.LANDSCAPE_FIXED, 
-				new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.camera);
+				new RatioResolutionPolicy(BaseScene.CAMERA_WIDTH, BaseScene.CAMERA_HEIGHT), this.camera);
 		//engineOptions.getAudioOptions().setNeedsMusic(true).setNeedsSound(true);
 		engineOptions.setWakeLockOptions(WakeLockOptions.SCREEN_ON);
 		return engineOptions;
