@@ -2,13 +2,13 @@ package com.pigote.baseAnd;
 
 import java.io.IOException;
 
-import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.IOnAreaTouchListener;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.ITouchArea;
 import org.andengine.entity.scene.Scene;
+import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
@@ -20,9 +20,9 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.opengl.util.GLState;
 import org.andengine.util.SAXUtils;
 import org.andengine.util.adt.align.HorizontalAlign;
+import org.andengine.util.adt.color.Color;
 import org.andengine.util.level.EntityLoader;
 import org.andengine.util.level.constants.LevelConstants;
 import org.andengine.util.level.simple.SimpleLevelEntityLoaderData;
@@ -50,7 +50,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	private Text scoreText;
 	private int score = 0;
 	
-	private Player player;
 	private Climber climber;
 	
     private MouseJoint mMouseJointActive;
@@ -72,16 +71,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD2 = "hold2";
 
 	private void createBackground(){
-		//setBackground(new Background(Color.BLUE));
-		attachChild(new Sprite(CAMERA_WIDTH/2, CAMERA_HEIGHT/2, resourcesManager.game_background_region, vbom)
-	    {
-	        @Override
-	        protected void preDraw(GLState pGLState, Camera pCamera) 
-	        {
-	            super.preDraw(pGLState, pCamera);
-	            pGLState.enableDither();
-	        }
-	    });
+		setBackground(new Background(Color.BLUE));
 	}
 	
 	private void createHUD(){
@@ -209,7 +199,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 {
                     if (x1.getBody().getUserData().equals("player"))
                     {
-                        player.increaseFootContacts();
+                        //player.increaseFootContacts();
                     }
                 }
             }
@@ -223,7 +213,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 {
                     if (x1.getBody().getUserData().equals("player"))
                     {
-                        player.decreaseFootContacts();
+                        //player.decreaseFootContacts();
                     }
                 }
             }
@@ -247,6 +237,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	    createHUD();
 	    createPhysics();
 	    loadLevel(1);
+	    climber = new Climber(BaseScene.CAMERA_WIDTH/2, BaseScene.CAMERA_HEIGHT/2, vbom, camera, physicsWorld, this);
 	    createGameOverText();
 	    setOnSceneTouchListener(this);
 	}
