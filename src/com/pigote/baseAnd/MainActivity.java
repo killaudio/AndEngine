@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.andengine.engine.Engine;
 import org.andengine.engine.LimitedFPSEngine;
 import org.andengine.engine.camera.BoundCamera;
-import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
@@ -21,9 +20,7 @@ import android.view.KeyEvent;
 public class MainActivity extends BaseGameActivity {
 	
     private BoundCamera camera;
-    private ResourcesManager resourcesManager;
-        
-	@Override
+    @Override
 	public EngineOptions onCreateEngineOptions() {
 		camera = new BoundCamera (0, 0, BaseScene.CAMERA_WIDTH, BaseScene.CAMERA_HEIGHT);
 		EngineOptions engineOptions = new EngineOptions(true,ScreenOrientation.LANDSCAPE_FIXED, 
@@ -38,7 +35,7 @@ public class MainActivity extends BaseGameActivity {
 			OnCreateResourcesCallback pOnCreateResourcesCallback)
 			throws IOException {
 		ResourcesManager.prepareManager(mEngine, this, camera, getVertexBufferObjectManager());
-		resourcesManager = ResourcesManager.getInstance();
+		ResourcesManager.getInstance();
 		pOnCreateResourcesCallback.onCreateResourcesFinished();		
 	}
 

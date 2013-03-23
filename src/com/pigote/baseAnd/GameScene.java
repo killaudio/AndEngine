@@ -5,8 +5,11 @@ import java.io.IOException;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.scene.IOnAreaTouchListener;
 import org.andengine.entity.scene.IOnSceneTouchListener;
+import org.andengine.entity.scene.ITouchArea;
 import org.andengine.entity.scene.Scene;
+import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
@@ -14,6 +17,8 @@ import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
+import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.util.GLState;
 import org.andengine.util.SAXUtils;
@@ -27,6 +32,8 @@ import org.xml.sax.Attributes;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
+import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -35,7 +42,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.pigote.baseAnd.SceneManager.SceneType;
 
-public class GameScene extends BaseScene implements IOnSceneTouchListener{
+public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAreaTouchListener{
 	
 	private PhysicsWorld physicsWorld;
 	
@@ -45,7 +52,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 	
 	private Player player;
 	private Climber climber;
-	private boolean firstTouch = false;
+	
+    private MouseJoint mMouseJointActive;
+    private Body mGroundBody;
 	
 	private Text gameOverText;
 	private boolean gameOverDisplayed = false;
@@ -261,21 +270,64 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener{
 	    // removing all game scene objects.
 	}
 
-	@Override
-	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
-		if (pSceneTouchEvent.isActionDown())
-	    {
-			if (!firstTouch)
-		       {
-		           player.setRunning();
-		           firstTouch = true;
-		       }
-		       else
-		       {
-		           player.jump();
-		       }
-	    }
-		return false;
-	}
+    @Override
+    public boolean onAreaTouched(TouchEvent pSceneTouchEvent, ITouchArea pTouchArea, float pTouchAreaLocalX,
+    		float pTouchAreaLocalY) {
+    	if(pSceneTouchEvent.isActionDown()) {
+    		final IShape face = (IShape) pTouchArea;
+    		 // If we have an active MouseJoint, we are just moving it around
+    		 // instead of creating a second one.
+    		if (this.mMouseJointActive == null) {
+    			//this.mEngine.vibrate(100);
+    			this.mMouseJointActive = this.createMouseJoint(face, pTouchAreaLocalX, pTouchAreaLocalY);
+    		}
+    		return true;
+    	}
+    	return false;
+    }
+	
+    @Override
+    public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
+    	if (this.physicsWorld != null) {
+    		switch(pSceneTouchEvent.getAction()) {
+
+    		case TouchEvent.ACTION_MOVE:
+    			if(this.mMouseJointActive != null) {
+    				final Vector2 vec = Vector2Pool.obtain(pSceneTouchEvent.getX() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
+    				this.mMouseJointActive.setTarget(vec);
+    				Vector2Pool.recycle(vec);
+    			}
+    			return true;
+    		case TouchEvent.ACTION_UP:
+    			if(this.mMouseJointActive != null) {
+    				this.physicsWorld.destroyJoint(this.mMouseJointActive);
+    				this.mMouseJointActive = null;
+    			}
+    			return true;
+    		}
+    		return false;
+    	}
+    	return false;
+    }
+
+    public MouseJoint createMouseJoint(final IShape pFace, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+    	final Body body = (Body) pFace.getUserData();
+    	final MouseJointDef mouseJointDef = new MouseJointDef();
+
+    	final Vector2 localPoint = Vector2Pool.obtain((pTouchAreaLocalX - pFace.getWidth() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, (pTouchAreaLocalY - pFace.getHeight() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
+    	this.mGroundBody.setTransform(localPoint, 0);
+
+    	mouseJointDef.bodyA = this.mGroundBody;
+    	mouseJointDef.bodyB = body;
+    	mouseJointDef.dampingRatio = 0.95f;
+    	mouseJointDef.frequencyHz = 30f;
+    	mouseJointDef.maxForce = (300.0f * body.getMass());
+    	mouseJointDef.collideConnected = true;
+
+    	mouseJointDef.target.set(body.getWorldPoint(localPoint));
+    	Vector2Pool.recycle(localPoint);
+
+    	return (MouseJoint) physicsWorld.createJoint(mouseJointDef);
+    }
 	
 }
