@@ -237,7 +237,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	    createHUD();
 	    createPhysics();
 	    loadLevel(1);
-	    climber = new Climber(BaseScene.CAMERA_WIDTH/2, BaseScene.CAMERA_HEIGHT/2, vbom, camera, physicsWorld, this);
+	    climber = new Climber(BaseScene.CAMERA_WIDTH/2, BaseScene.CAMERA_HEIGHT, vbom, camera, physicsWorld, this);
 	    createGameOverText();
 	    setOnSceneTouchListener(this);
 	}

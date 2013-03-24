@@ -46,9 +46,8 @@ public class ResourcesManager
     
     //climber dude
     public ITextureRegion m_Head;
-    public ITextureRegion m_Torso1;
-    public ITextureRegion m_Torso2;
-    public ITextureRegion m_Torso3;
+    public ITextureRegion m_UpperTorso;
+    public ITextureRegion m_LowerTorso;
     public ITextureRegion m_UpperArmLeft;
     public ITextureRegion m_UpperArmRight;
     public ITextureRegion m_LowerArmLeft;
@@ -57,7 +56,10 @@ public class ResourcesManager
     public ITextureRegion m_UpperLegRight;
     public ITextureRegion m_LowerLegLeft;
     public ITextureRegion m_LowerLegRight;
-    public ITextureRegion m_DebugTexture;
+    public ITextureRegion m_HandLeft;
+    public ITextureRegion m_HandRight;
+    public ITextureRegion m_FootLeft;
+    public ITextureRegion m_FootRight;
     
     private BuildableBitmapTextureAtlas gameTextureAtlas;
     private BuildableBitmapTextureAtlas climberTextureAtlas;
@@ -150,9 +152,8 @@ public class ResourcesManager
     	climberTextureAtlas = new BuildableBitmapTextureAtlas(activity.getTextureManager(), 1024, 1024, TextureOptions.NEAREST);
 
         m_Head = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "head.png");
-        m_Torso1 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "torso1.png");
-        m_Torso2 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "torso2.png");
-        m_Torso3 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "torso3.png");
+        m_LowerTorso = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_torso.png");
+        m_UpperTorso = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_torso.png");
         m_UpperArmLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_arm_left.png");
         m_UpperArmRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_arm_right.png");
         m_LowerArmLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_arm_left.png");
@@ -161,7 +162,10 @@ public class ResourcesManager
         m_UpperLegRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "upper_leg_right.png");
         m_LowerLegLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_leg_left.png");
         m_LowerLegRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "lower_leg_right.png");
-
+        m_HandLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "hand_left.png");
+        m_HandRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "hand_right.png");
+        m_FootLeft = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "foot_left.png");
+        m_FootRight = BitmapTextureAtlasTextureRegionFactory.createFromAsset(climberTextureAtlas, activity, "foot_right.png");
         try 
     	{
     	    this.gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
