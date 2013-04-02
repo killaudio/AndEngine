@@ -35,6 +35,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -240,8 +241,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	    //loadLevel(1);
 	    loadDebugBox(physicsWorld, this);
 	    climber = new Climber(BaseScene.CAMERA_WIDTH/2, BaseScene.CAMERA_HEIGHT, vbom, camera, physicsWorld, this);
+	    mGroundBody = this.physicsWorld.createBody(new BodyDef());
 	    createGameOverText();
 	    setOnSceneTouchListener(this);
+	    setOnAreaTouchListener(this);
 	}
 
 	@Override
