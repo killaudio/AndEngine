@@ -198,14 +198,14 @@ public class Climber {
    	//L
    	m_HandLeftSprite.setPosition(px - (m_UpperTorsoSprite.getWidth()/2 + m_UpperArmLeftSprite.getWidth() + m_LowerArmLeftSprite.getWidth() + m_HandLeftSprite.getWidth()/2),
    								py - (m_HeadSprite.getHeight()/2 + m_UpperArmLeftSprite.getHeight()/2));
-   	Body handL = PhysicsFactory.createBoxBody(m_PhysicsWorld, m_HandLeftSprite, BodyType.DynamicBody, fixtureDef);
+   	Body handL = PhysicsFactory.createCircleBody(m_PhysicsWorld, m_HandLeftSprite, BodyType.DynamicBody, fixtureDef);
    	m_HandLeftSprite.setUserData(handL);
    	m_PhysicsWorld.registerPhysicsConnector(new PhysicsConnector(m_HandLeftSprite, handL));
 
    	//R
 	m_HandRightSprite.setPosition(px + (m_UpperTorsoSprite.getWidth()/2 + m_UpperArmRightSprite.getWidth() + m_LowerArmRightSprite.getWidth() + m_HandRightSprite.getWidth()/2),
 								py - (m_HeadSprite.getHeight()/2 + m_UpperArmRightSprite.getHeight()/2));
-   	Body handR = PhysicsFactory.createBoxBody(m_PhysicsWorld, m_HandRightSprite, BodyType.DynamicBody, fixtureDef);
+   	Body handR = PhysicsFactory.createCircleBody(m_PhysicsWorld, m_HandRightSprite, BodyType.DynamicBody, fixtureDef);
    	m_HandRightSprite.setUserData(handR);
    	m_PhysicsWorld.registerPhysicsConnector(new PhysicsConnector(m_HandRightSprite, handR));
    	

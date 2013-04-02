@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnAreaTouchListener;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.ITouchArea;
@@ -236,7 +237,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	    createBackground();
 	    createHUD();
 	    createPhysics();
-	    loadLevel(1);
+	    //loadLevel(1);
+	    loadDebugBox(physicsWorld, this);
 	    climber = new Climber(BaseScene.CAMERA_WIDTH/2, BaseScene.CAMERA_HEIGHT, vbom, camera, physicsWorld, this);
 	    createGameOverText();
 	    setOnSceneTouchListener(this);
@@ -320,5 +322,26 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 
     	return (MouseJoint) physicsWorld.createJoint(mouseJointDef);
     }
+    
+	private void loadDebugBox(PhysicsWorld m_PhysicsWorld, Scene pScene) {
+		int m_CameraWidth = BaseScene.CAMERA_WIDTH;
+		int m_CameraHeight = BaseScene.CAMERA_HEIGHT;
+		
+		final Rectangle ground = new Rectangle(m_CameraWidth / 2, 1, m_CameraWidth, 2, vbom);
+		//final Rectangle roof = new Rectangle(m_CameraWidth / 2, m_CameraHeight - 1, m_CameraWidth, 2, vbom);
+		final Rectangle left = new Rectangle(1, m_CameraHeight / 2, 1, m_CameraHeight, vbom);
+		final Rectangle right = new Rectangle(m_CameraWidth - 1, m_CameraHeight / 2, 2, m_CameraHeight, vbom);
+
+    	final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(1.0f, 0.2f, 0.1f);
+
+    	//PhysicsFactory.createBoxBody(m_PhysicsWorld, roof, BodyType.StaticBody, wallFixtureDef);
+    	PhysicsFactory.createBoxBody(m_PhysicsWorld, ground, BodyType.StaticBody, wallFixtureDef);
+    	PhysicsFactory.createBoxBody(m_PhysicsWorld, left, BodyType.StaticBody, wallFixtureDef);
+    	PhysicsFactory.createBoxBody(m_PhysicsWorld, right, BodyType.StaticBody, wallFixtureDef);
+    	
+    	pScene.attachChild(ground);
+    	pScene.attachChild(left);
+    	pScene.attachChild(right);
+	}
 	
 }
