@@ -3,6 +3,7 @@ package com.pigote.baseAnd;
 import java.io.IOException;
 
 import org.andengine.engine.camera.hud.HUD;
+import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnAreaTouchListener;
@@ -275,7 +276,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     		 // instead of creating a second one.
     		if (this.mMouseJointActive == null) {
     			//this.mEngine.vibrate(100);
-    			this.mMouseJointActive = this.createMouseJoint(face, pTouchAreaLocalX, pTouchAreaLocalY);
+    			String ud = (String) ((Body) face.getUserData()).getUserData(); 
+    			if( ud.equals("foot") || ud.equals("hand")){
+    				this.mMouseJointActive = this.createMouseJoint(face, pTouchAreaLocalX, pTouchAreaLocalY);
+    			}
     		}
     		return true;
     	}
