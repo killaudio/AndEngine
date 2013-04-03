@@ -3,7 +3,6 @@ package com.pigote.baseAnd;
 import java.io.IOException;
 
 import org.andengine.engine.camera.hud.HUD;
-import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnAreaTouchListener;
@@ -16,7 +15,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
 import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
-import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
@@ -36,6 +34,8 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
+import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
+import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -104,8 +104,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     {
         final SimpleLevelLoader levelLoader = new SimpleLevelLoader(vbom);
         
-        final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(0, 0.01f, 0.5f);
-        
         levelLoader.registerEntityLoader(new EntityLoader<SimpleLevelEntityLoaderData>(LevelConstants.TAG_LEVEL)
         {
             public IEntity onLoadEntity(final String pEntityName, final IEntity pParent, final Attributes pAttributes, final SimpleLevelEntityLoaderData pSimpleLevelEntityLoaderData) throws IOException 
@@ -132,15 +130,11 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 
                 if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD1))
                 {
-                    levelObject = new Sprite(x, y, resourcesManager.hold1_region, vbom);
-                    PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF).setUserData("hold1");
+                    levelObject = new Hold(x, y, resourcesManager.hold1_region, vbom, 100, physicsWorld);
                 } 
                 else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD2))
                 {
-                    levelObject = new Sprite(x, y, resourcesManager.hold2_region, vbom);
-                    final Body body = PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF);
-                    body.setUserData("hold2");
-                    physicsWorld.registerPhysicsConnector(new PhysicsConnector(levelObject, body, true, false));
+                    levelObject = new Hold(x, y, resourcesManager.hold2_region, vbom, 50, physicsWorld);
                 }
 //                else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_COIN))
 //                {
@@ -175,59 +169,54 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
         levelLoader.loadLevelFromAsset(activity.getAssets(), "walls/" + levelID + ".lvl");
     }
 	
-    private void createGameOverText()
-    {
+    private void createGameOverText(){
         gameOverText = new Text(0, 0, resourcesManager.font, "Game Over!", vbom);
     }
 
-    private void displayGameOverText()
-    {
+    private void displayGameOverText(){
         camera.setChaseEntity(null);
         gameOverText.setPosition(camera.getCenterX(), camera.getCenterY());
         attachChild(gameOverText);
         gameOverDisplayed = true;
     }
     
-    private ContactListener contactListener()
-    {
-        ContactListener contactListener = new ContactListener()
-        {
-        	//TODO Validate that fixtures equals to whatever we want to interact with
-            public void beginContact(Contact contact)
-            {
+    private ContactListener contactListener(){
+        ContactListener contactListener = new ContactListener(){
+            public void beginContact(Contact contact){
                 final Fixture x1 = contact.getFixtureA();
                 final Fixture x2 = contact.getFixtureB();
-
-                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
-                {
-                    if (x1.getBody().getUserData().equals("player"))
-                    {
-                        //player.increaseFootContacts();
-                    }
+                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
+	                if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("hand")){
+	                	if (climber.jointLeftHand == null)
+	                	addToScore(1);
+	                	//climber.jointLeftHand = createHoldJoint(x1, x2);
+	                } else if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("foot")) {
+	                	addToScore(-1);
+	                }
                 }
             }
 
-            public void endContact(Contact contact)
-            {
-                final Fixture x1 = contact.getFixtureA();
+            public void endContact(Contact contact){
+            	final Fixture x1 = contact.getFixtureA();
                 final Fixture x2 = contact.getFixtureB();
-
-                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
-                {
-                    if (x1.getBody().getUserData().equals("player"))
-                    {
-                        //player.decreaseFootContacts();
-                    }
-                }
+                if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
+	                if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("hand")){
+	                	if(climber.jointLeftHand != null) {
+	        				physicsWorld.destroyJoint(climber.jointLeftHand);
+	        				climber.jointLeftHand = null;
+	        			}
+	                	addToScore(10);
+	                } else if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("foot")) {
+	                	addToScore(-10);
+	                }
+                }               
             }
 
-            public void preSolve(Contact contact, Manifold oldManifold)
-            {
+            public void preSolve(Contact contact, Manifold oldManifold){
 
             }
 
-            public void postSolve(Contact contact, ContactImpulse impulse)
-            {
+            public void postSolve(Contact contact, ContactImpulse impulse){
 
             }
         };
@@ -239,7 +228,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	    createBackground();
 	    createHUD();
 	    createPhysics();
-	    //loadLevel(1);
+	    loadLevel(1);
 	    loadDebugBox(physicsWorld, this);
 	    climber = new Climber(BaseScene.CAMERA_WIDTH/2, BaseScene.CAMERA_HEIGHT, vbom, camera, physicsWorld, this);
 	    mGroundBody = this.physicsWorld.createBody(new BodyDef());
@@ -328,6 +317,16 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     	Vector2Pool.recycle(localPoint);
 
     	return (MouseJoint) physicsWorld.createJoint(mouseJointDef);
+    }
+    
+    public WeldJoint createHoldJoint(final Fixture pHold, final Fixture climberLimb) {
+    	final Body hold = (Body) pHold.getBody();
+    	final Body limb = (Body) climberLimb.getBody();
+    	WeldJointDef wjd = new WeldJointDef();
+
+    	wjd.initialize(hold, limb, limb.getWorldCenter());
+    	WeldJoint tmp = (WeldJoint) physicsWorld.createJoint(wjd);
+    	return tmp;
     }
     
 	private void loadDebugBox(PhysicsWorld m_PhysicsWorld, Scene pScene) {

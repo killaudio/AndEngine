@@ -13,7 +13,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
+import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
 
 public class Climber {
 
@@ -33,6 +35,8 @@ public class Climber {
 	public Sprite m_HandRightSprite;
 	public Sprite m_FootLeftSprite;
 	public Sprite m_FootRightSprite;
+	
+	public WeldJoint jointLeftHand;
 
 	private final int ANKLE_WIDTH = 15;
 
