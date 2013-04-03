@@ -13,9 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
-import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
 
 public class Climber {
 
@@ -36,8 +35,13 @@ public class Climber {
 	public Sprite m_FootLeftSprite;
 	public Sprite m_FootRightSprite;
 	
-	public WeldJoint jointLeftHand;
+	private Joint jointLH;
+	private Joint jointRH;
+	private Joint jointLF;
+	private Joint jointRF;
 
+	private Body handL;
+	
 	private final int ANKLE_WIDTH = 15;
 
 	public Climber(float pX, float pY, VertexBufferObjectManager vbo, Camera camera, PhysicsWorld physicsWorld, Scene scene) {
@@ -215,7 +219,7 @@ public class Climber {
 		//L
 		m_HandLeftSprite.setPosition(px - (m_UpperTorsoSprite.getWidth()/2 + m_UpperArmLeftSprite.getWidth() + m_LowerArmLeftSprite.getWidth() + m_HandLeftSprite.getWidth()/2),
 				py - (m_HeadSprite.getHeight()/2));
-		Body handL = PhysicsFactory.createCircleBody(m_PhysicsWorld, m_HandLeftSprite, BodyType.DynamicBody, fixtureDef);
+		handL = PhysicsFactory.createCircleBody(m_PhysicsWorld, m_HandLeftSprite, BodyType.DynamicBody, fixtureDef);
 		handL.setUserData("hand");
 		m_HandLeftSprite.setUserData(handL);
 		m_PhysicsWorld.registerPhysicsConnector(new PhysicsConnector(m_HandLeftSprite, handL));
@@ -369,6 +373,15 @@ public class Climber {
 		jd.upperAngle = (float) (15 / (180 / Math.PI));
 		jd.initialize(footR, lowerLegR, getBottomPoint(m_LowerLegLeftSprite, lowerLegR));
 		m_PhysicsWorld.createJoint(jd);
+	}
+	
+	public void grabHold(Body bodyB, PhysicsWorld m_PhysicsWorld){
+		RevoluteJointDef jd = new RevoluteJointDef();
+		jd.enableLimit = true;
+		jd.lowerAngle = (float) (-1 / (180 / Math.PI));
+		jd.upperAngle = (float) (1 / (180 / Math.PI));
+		jd.initialize(handL, bodyB, handL.getPosition());
+		jointLH = m_PhysicsWorld.createJoint(jd);
 	}
 
 }

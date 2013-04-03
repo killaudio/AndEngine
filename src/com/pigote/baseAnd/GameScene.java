@@ -57,7 +57,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	
     private MouseJoint mMouseJointActive;
     private Body mGroundBody;
-	
+    private Body hold;
+    
 	private Text gameOverText;
 	private boolean gameOverDisplayed = false;
     
@@ -130,7 +131,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 
                 if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD1))
                 {
-                    levelObject = new Hold(x, y, resourcesManager.hold1_region, vbom, 100, physicsWorld);
+                    Hold h = new Hold(x, y, resourcesManager.hold1_region, vbom, 100, physicsWorld);
+                    levelObject = h;
+                    hold = h.getHold();
                 } 
                 else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD2))
                 {
@@ -187,9 +190,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 final Fixture x2 = contact.getFixtureB();
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
 	                if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("hand")){
-	                	if (climber.jointLeftHand == null)
 	                	addToScore(1);
-	                	//climber.jointLeftHand = createHoldJoint(x1, x2);
+	                	climber.grabHold(hold, physicsWorld);
 	                } else if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("foot")) {
 	                	addToScore(-1);
 	                }
@@ -201,10 +203,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 final Fixture x2 = contact.getFixtureB();
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
 	                if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("hand")){
-	                	if(climber.jointLeftHand != null) {
-	        				physicsWorld.destroyJoint(climber.jointLeftHand);
-	        				climber.jointLeftHand = null;
-	        			}
 	                	addToScore(10);
 	                } else if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("foot")) {
 	                	addToScore(-10);
@@ -319,17 +317,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     	return (MouseJoint) physicsWorld.createJoint(mouseJointDef);
     }
     
-    public WeldJoint createHoldJoint(final Fixture pHold, final Fixture climberLimb) {
-    	final Body hold = (Body) pHold.getBody();
-    	final Body limb = (Body) climberLimb.getBody();
-    	WeldJointDef wjd = new WeldJointDef();
-
-    	wjd.initialize(hold, limb, limb.getWorldCenter());
-    	WeldJoint tmp = (WeldJoint) physicsWorld.createJoint(wjd);
-    	return tmp;
-    }
-    
-	private void loadDebugBox(PhysicsWorld m_PhysicsWorld, Scene pScene) {
+    private void loadDebugBox(PhysicsWorld m_PhysicsWorld, Scene pScene) {
 		int m_CameraWidth = BaseScene.CAMERA_WIDTH;
 		int m_CameraHeight = BaseScene.CAMERA_HEIGHT;
 		
