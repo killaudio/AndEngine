@@ -377,7 +377,12 @@ public class Climber {
 		jd.lowerAngle = (float) (-1 / (180 / Math.PI));
 		jd.upperAngle = (float) (1 / (180 / Math.PI));
 		jd.initialize(hand, bodyB, hand.getWorldPoint(bodyB.getPosition()));
-		m_PhysicsWorld.createJoint(jd);
+		if(hand.getUserData().equals("handL")){
+			handLJ = (RevoluteJoint) m_PhysicsWorld.createJoint(jd);
+		} else if(hand.getUserData().equals("handR")){
+			handRJ = (RevoluteJoint) m_PhysicsWorld.createJoint(jd);
+		}
+			
 	}
 
 	public void releaseHold(Body hand, PhysicsWorld physicsWorld) {
