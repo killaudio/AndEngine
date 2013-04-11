@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
 public class Climber {
@@ -34,16 +34,12 @@ public class Climber {
 	public Sprite m_HandRightSprite;
 	public Sprite m_FootLeftSprite;
 	public Sprite m_FootRightSprite;
-	
-	private Joint jointLH;
-	private Joint jointRH;
-	private Joint jointLF;
-	private Joint jointRF;
 
-	private Body handL;
+	private RevoluteJoint handLJ;
+	private RevoluteJoint handRJ;
 	
 	private final int ANKLE_WIDTH = 15;
-
+	
 	public Climber(float pX, float pY, VertexBufferObjectManager vbo, Camera camera, PhysicsWorld physicsWorld, Scene scene) {
 		createRagdoll(vbo, physicsWorld, pX, pY);
 		attachToScene(scene);
@@ -219,8 +215,8 @@ public class Climber {
 		//L
 		m_HandLeftSprite.setPosition(px - (m_UpperTorsoSprite.getWidth()/2 + m_UpperArmLeftSprite.getWidth() + m_LowerArmLeftSprite.getWidth() + m_HandLeftSprite.getWidth()/2),
 				py - (m_HeadSprite.getHeight()/2));
-		handL = PhysicsFactory.createCircleBody(m_PhysicsWorld, m_HandLeftSprite, BodyType.DynamicBody, fixtureDef);
-		handL.setUserData("hand");
+		Body handL = PhysicsFactory.createCircleBody(m_PhysicsWorld, m_HandLeftSprite, BodyType.DynamicBody, fixtureDef);
+		handL.setUserData("handL");
 		m_HandLeftSprite.setUserData(handL);
 		m_PhysicsWorld.registerPhysicsConnector(new PhysicsConnector(m_HandLeftSprite, handL));
 
@@ -228,7 +224,7 @@ public class Climber {
 		m_HandRightSprite.setPosition(px + (m_UpperTorsoSprite.getWidth()/2 + m_UpperArmRightSprite.getWidth() + m_LowerArmRightSprite.getWidth() + m_HandRightSprite.getWidth()/2),
 				py - (m_HeadSprite.getHeight()/2));
 		Body handR = PhysicsFactory.createCircleBody(m_PhysicsWorld, m_HandRightSprite, BodyType.DynamicBody, fixtureDef);
-		handR.setUserData("hand");
+		handR.setUserData("handR");
 		m_HandRightSprite.setUserData(handR);
 		m_PhysicsWorld.registerPhysicsConnector(new PhysicsConnector(m_HandRightSprite, handR));
 
@@ -375,13 +371,24 @@ public class Climber {
 		m_PhysicsWorld.createJoint(jd);
 	}
 	
-	public void grabHold(Body bodyB, PhysicsWorld m_PhysicsWorld){
+	public void grabHold(Body bodyB, Body hand, PhysicsWorld m_PhysicsWorld){
 		RevoluteJointDef jd = new RevoluteJointDef();
 		jd.enableLimit = true;
 		jd.lowerAngle = (float) (-1 / (180 / Math.PI));
 		jd.upperAngle = (float) (1 / (180 / Math.PI));
-		jd.initialize(handL, bodyB, handL.getPosition());
-		jointLH = m_PhysicsWorld.createJoint(jd);
+		jd.initialize(hand, bodyB, hand.getWorldPoint(bodyB.getPosition()));
+		m_PhysicsWorld.createJoint(jd);
+	}
+
+	public void releaseHold(Body hand, PhysicsWorld physicsWorld) {
+		if (hand.getJointList().size() > 1) {
+			if(hand.getUserData().equals("handL")){
+				physicsWorld.destroyJoint(handLJ);
+			} else if(hand.getUserData().equals("handR")){
+				physicsWorld.destroyJoint(handRJ);
+			}
+		}
+		
 	}
 
 }

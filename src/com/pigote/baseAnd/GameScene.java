@@ -55,9 +55,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	
 	private Climber climber;
 	
-    private MouseJoint mMouseJointActive;
-    private Body mGroundBody;
-    private Body hold;
+    private MouseJoint mouseJointActive;
+    private Body groundBody;
+    private Body holdL;
+    private Body holdR;
     
 	private Text gameOverText;
 	private boolean gameOverDisplayed = false;
@@ -133,7 +134,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 {
                     Hold h = new Hold(x, y, resourcesManager.hold1_region, vbom, 100, physicsWorld);
                     levelObject = h;
-                    hold = h.getHold();
                 } 
                 else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD2))
                 {
@@ -189,9 +189,11 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 final Fixture x1 = contact.getFixtureA();
                 final Fixture x2 = contact.getFixtureB();
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
-	                if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("hand")){
+	                if (x1.getBody().getUserData().equals("hold") && 
+	                		(x2.getBody().getUserData().equals("handL") || x2.getBody().getUserData().equals("handR"))){
 	                	addToScore(1);
-	                	climber.grabHold(hold, physicsWorld);
+	                	if (x2.getBody().getUserData().equals("handL"))
+	                	holdL = x1.getBody(); else holdR = x1.getBody();
 	                } else if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("foot")) {
 	                	addToScore(-1);
 	                }
@@ -202,10 +204,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
             	final Fixture x1 = contact.getFixtureA();
                 final Fixture x2 = contact.getFixtureB();
                 if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
-	                if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("hand")){
-	                	addToScore(10);
+	                if (x1.getBody().getUserData().equals("hold") && 
+	                		(x2.getBody().getUserData().equals("handL") || x2.getBody().getUserData().equals("handR"))){
+	                	addToScore(10); //destroy joint
+	                	if (x2.getBody().getUserData().equals("handL"))
+		                	holdL = null; else holdR = null;
 	                } else if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("foot")) {
-	                	addToScore(-10);
+	                	addToScore(-10); //Nothing to do here I think
 	                }
                 }               
             }
@@ -229,7 +234,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	    loadLevel(1);
 	    loadDebugBox(physicsWorld, this);
 	    climber = new Climber(BaseScene.CAMERA_WIDTH/2, BaseScene.CAMERA_HEIGHT, vbom, camera, physicsWorld, this);
-	    mGroundBody = this.physicsWorld.createBody(new BodyDef());
+	    groundBody = this.physicsWorld.createBody(new BodyDef());
 	    createGameOverText();
 	    setOnSceneTouchListener(this);
 	    setOnAreaTouchListener(this);
@@ -257,18 +262,31 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     @Override
     public boolean onAreaTouched(TouchEvent pSceneTouchEvent, ITouchArea pTouchArea, float pTouchAreaLocalX,
     		float pTouchAreaLocalY) {
+    	final IShape face = (IShape) pTouchArea;
     	if(pSceneTouchEvent.isActionDown()) {
-    		final IShape face = (IShape) pTouchArea;
     		 // If we have an active MouseJoint, we are just moving it around
     		 // instead of creating a second one.
-    		if (this.mMouseJointActive == null) {
+    		if (this.mouseJointActive == null) {
     			//this.mEngine.vibrate(100);
     			String ud = (String) ((Body) face.getUserData()).getUserData(); 
-    			if( ud.equals("foot") || ud.equals("hand")){
-    				this.mMouseJointActive = this.createMouseJoint(face, pTouchAreaLocalX, pTouchAreaLocalY);
+    			if( ud.equals("handL") || ud.equals("handR") || ud.equals("foot")){
+    				climber.releaseHold((Body) face.getUserData(), physicsWorld);
+    				this.mouseJointActive = this.createMouseJoint(face, pTouchAreaLocalX, pTouchAreaLocalY);
     			}
     		}
     		return true;
+    	} else if(pSceneTouchEvent.isActionUp()) {
+    		if (this.mouseJointActive != null) {
+    			//this.mEngine.vibrate(100);
+    			String ud = (String) ((Body) face.getUserData()).getUserData(); 
+    			if(ud.equals("handL") && holdL!= null){
+    				climber.grabHold(holdL, (Body) face.getUserData(), physicsWorld);
+    			} else if (ud.equals("handR") && holdR!= null){
+    				climber.grabHold(holdR, (Body) face.getUserData(), physicsWorld);
+    			} else {
+    				
+    			}
+    		}
     	}
     	return false;
     }
@@ -279,16 +297,16 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     		switch(pSceneTouchEvent.getAction()) {
 
     		case TouchEvent.ACTION_MOVE:
-    			if(this.mMouseJointActive != null) {
+    			if(this.mouseJointActive != null) {
     				final Vector2 vec = Vector2Pool.obtain(pSceneTouchEvent.getX() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-    				this.mMouseJointActive.setTarget(vec);
+    				this.mouseJointActive.setTarget(vec);
     				Vector2Pool.recycle(vec);
     			}
     			return true;
     		case TouchEvent.ACTION_UP:
-    			if(this.mMouseJointActive != null) {
-    				this.physicsWorld.destroyJoint(this.mMouseJointActive);
-    				this.mMouseJointActive = null;
+    			if(this.mouseJointActive != null) {
+    				this.physicsWorld.destroyJoint(this.mouseJointActive);
+    				this.mouseJointActive = null;
     			}
     			return true;
     		}
@@ -302,13 +320,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     	final MouseJointDef mouseJointDef = new MouseJointDef();
 
     	final Vector2 localPoint = Vector2Pool.obtain((pTouchAreaLocalX - pFace.getWidth() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, (pTouchAreaLocalY - pFace.getHeight() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-    	this.mGroundBody.setTransform(localPoint, 0);
+    	this.groundBody.setTransform(localPoint, 0);
 
-    	mouseJointDef.bodyA = this.mGroundBody;
+    	mouseJointDef.bodyA = this.groundBody;
     	mouseJointDef.bodyB = body;
     	mouseJointDef.dampingRatio = 0.95f;
     	mouseJointDef.frequencyHz = 30f;
-    	mouseJointDef.maxForce = (300.0f * body.getMass());
+    	mouseJointDef.maxForce = (250.0f * body.getMass());
     	mouseJointDef.collideConnected = true;
 
     	mouseJointDef.target.set(body.getWorldPoint(localPoint));

@@ -20,7 +20,7 @@ public class Hold extends Sprite {
 			VertexBufferObjectManager vbom, int goodness, PhysicsWorld physicsWorld) {
 		super(pX, pY, pTextureRegion, vbom);
 		this.goodness = goodness;
-		//fixture_def.isSensor = true;
+		fixture_def.isSensor = true;
 		this.body = PhysicsFactory.createBoxBody(physicsWorld, this, BodyType.StaticBody, fixture_def);
         body.setUserData("hold");
         physicsWorld.registerPhysicsConnector(new PhysicsConnector(this, body, true, false));
@@ -29,8 +29,5 @@ public class Hold extends Sprite {
 	public int getGoodness() {
 		return goodness;
 	}
-	
-	public Body getHold() {
-		return body;
-	}
+
 }
