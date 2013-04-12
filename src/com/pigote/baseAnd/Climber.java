@@ -406,7 +406,7 @@ public class Climber {
 
 	public void flex(limb myLimb) {
 		final float speed = 5;
-		final float torque = 600;
+		final float torque = 400;
 		switch (myLimb) {
 		case LARM_UP : 
 			elbowL.setMaxMotorTorque(torque);
