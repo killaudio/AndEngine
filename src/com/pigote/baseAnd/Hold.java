@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class Hold extends Sprite {
-	private FixtureDef fixture_def = PhysicsFactory.createFixtureDef(0, 0.01f, 0.5f);
+	private FixtureDef fixture_def = PhysicsFactory.createFixtureDef(0, 0.01f, 1.0f);
 	private final int goodness;
 	private final Body body;
 	
@@ -20,6 +20,7 @@ public class Hold extends Sprite {
 			VertexBufferObjectManager vbom, int goodness, PhysicsWorld physicsWorld) {
 		super(pX, pY, pTextureRegion, vbom);
 		this.goodness = goodness;
+		this.fixture_def.friction = goodness/100;
 		fixture_def.isSensor = true;
 		this.body = PhysicsFactory.createBoxBody(physicsWorld, this, BodyType.StaticBody, fixture_def);
         body.setUserData("hold");

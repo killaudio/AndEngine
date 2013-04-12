@@ -74,6 +74,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
         
     private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD1 = "hold1";
     private static final Object TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD2 = "hold2";
+    public static enum limb {LARM_UP, LARM_LOW, RARM_UP, RARM_LOW,
+    								LLEG_UP, LLEG_LOW, RLEG_UP, RLEG_LOW}
 
 	private void createBackground(){
 		setBackground(new Background(Color.BLUE));
@@ -132,32 +134,12 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
                 
                 if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD1))
                 {
-                    Hold h = new Hold(x, y, resourcesManager.hold1_region, vbom, 100, physicsWorld);
-                    levelObject = h;
+                	levelObject = new Hold(x, y, resourcesManager.hold1_region, vbom, 100, physicsWorld);
                 } 
                 else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_HOLD2))
                 {
-                    levelObject = new Hold(x, y, resourcesManager.hold2_region, vbom, 50, physicsWorld);
+                    levelObject = new Hold(x, y, resourcesManager.hold2_region, vbom, 100, physicsWorld);
                 }
-//                else if (type.equals(TAG_ENTITY_ATTRIBUTE_TYPE_VALUE_COIN))
-//                {
-//                    levelObject = new Sprite(x, y, resourcesManager.coin_region, vbom)
-//                    {
-//                        @Override
-//                        protected void onManagedUpdate(float pSecondsElapsed) 
-//                        {
-//                            super.onManagedUpdate(pSecondsElapsed);
-//                            
-//					                if (player.collidesWith(this))
-//					                {
-//					                    addToScore(10);
-//					                    this.setVisible(false);
-//					                    this.setIgnoreUpdate(true);
-//					                }
-//                        }
-//                    };
-//                    levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
-//                }
                 else
                 {
                     throw new IllegalArgumentException();
@@ -263,12 +245,12 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     public boolean onAreaTouched(TouchEvent pSceneTouchEvent, ITouchArea pTouchArea, float pTouchAreaLocalX,
     		float pTouchAreaLocalY) {
     	final IShape face = (IShape) pTouchArea;
+    	String ud = (String) ((Body) face.getUserData()).getUserData();
     	if(pSceneTouchEvent.isActionDown()) {
     		 // If we have an active MouseJoint, we are just moving it around
     		 // instead of creating a second one.
     		if (this.mouseJointActive == null) {
     			//this.mEngine.vibrate(100);
-    			String ud = (String) ((Body) face.getUserData()).getUserData(); 
     			if( ud.equals("handL") || ud.equals("handR") || ud.equals("foot")){
     				climber.releaseHold((Body) face.getUserData(), physicsWorld);
     				this.mouseJointActive = this.createMouseJoint(face, pTouchAreaLocalX, pTouchAreaLocalY);
@@ -278,13 +260,28 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     	} else if(pSceneTouchEvent.isActionUp()) {
     		if (this.mouseJointActive != null) {
     			//this.mEngine.vibrate(100);
-    			String ud = (String) ((Body) face.getUserData()).getUserData(); 
     			if(ud.equals("handL") && holdL!= null){
     				climber.grabHold(holdL, (Body) face.getUserData(), physicsWorld);
     			} else if (ud.equals("handR") && holdR!= null){
     				climber.grabHold(holdR, (Body) face.getUserData(), physicsWorld);
-    			} else {
-    				
+    			}
+    		} else if (this.mouseJointActive == null) {
+    			if(ud.equals("lowerArmL")){
+    				climber.flex(limb.LARM_UP);
+    			} else if(ud.equals("lowerArmR")){
+    				climber.flex(limb.RARM_UP);
+    			} else if(ud.equals("lowerLegL")){
+    				climber.flex(limb.LLEG_UP);
+    			} else if(ud.equals("lowerLegR")){
+    				climber.flex(limb.RLEG_UP);
+    			} else if(ud.equals("upperArmL")){
+    				climber.relax(limb.LARM_LOW);
+    			} else if(ud.equals("upperArmR")){
+    				climber.relax(limb.RARM_LOW);
+    			} else if(ud.equals("upperLegL")){
+    				climber.relax(limb.LLEG_LOW);
+    			} else if(ud.equals("upperLegR")){
+    				climber.relax(limb.RLEG_LOW);
     			}
     		}
     	}
@@ -326,7 +323,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     	mouseJointDef.bodyB = body;
     	mouseJointDef.dampingRatio = 0.95f;
     	mouseJointDef.frequencyHz = 30f;
-    	mouseJointDef.maxForce = (250.0f * body.getMass());
+    	mouseJointDef.maxForce = (300.0f * body.getMass());
     	mouseJointDef.collideConnected = true;
 
     	mouseJointDef.target.set(body.getWorldPoint(localPoint));

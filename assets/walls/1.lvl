@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level width="780" height="1000">
     <entity x="100" y="300" type="hold1"/>
+    <entity x="300" y="350" type="hold2"/>
 </level>
