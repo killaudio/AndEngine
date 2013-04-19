@@ -59,6 +59,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     private Body groundBody;
     private Body holdL;
     private Body holdR;
+    private Body chipL;
+    private Body chipR;
     
 	private Text gameOverText;
 	private boolean gameOverDisplayed = false;
@@ -176,8 +178,11 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
 	                	addToScore(1);
 	                	if (x2.getBody().getUserData().equals("handL"))
 	                	holdL = x1.getBody(); else holdR = x1.getBody();
-	                } else if (x1.getBody().getUserData().equals("hold") && x2.getBody().getUserData().equals("foot")) {
+	                } else if (x1.getBody().getUserData().equals("hold") && 
+	                		(x2.getBody().getUserData().equals("footL") || x2.getBody().getUserData().equals("footR"))) {
 	                	addToScore(-1);
+	                	if (x2.getBody().getUserData().equals("footL"))
+		                	chipL = x1.getBody(); else chipR = x1.getBody();
 	                }
                 }
             }
@@ -251,7 +256,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     		 // instead of creating a second one.
     		if (this.mouseJointActive == null) {
     			//this.mEngine.vibrate(100);
-    			if( ud.equals("handL") || ud.equals("handR") || ud.equals("foot")){
+    			if( ud.equals("handL") || ud.equals("handR") || ud.equals("footL") || ud.equals("footR")){
     				climber.releaseHold((Body) face.getUserData(), physicsWorld);
     				this.mouseJointActive = this.createMouseJoint(face, pTouchAreaLocalX, pTouchAreaLocalY);
     			}
@@ -264,9 +269,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     				climber.grabHold(holdL, (Body) face.getUserData(), physicsWorld);
     			} else if (ud.equals("handR") && holdR!= null){
     				climber.grabHold(holdR, (Body) face.getUserData(), physicsWorld);
+    			} else if (ud.equals("footL") && chipL!= null){
+    				climber.grabHold(chipL, (Body) face.getUserData(), physicsWorld);
+    			} else if (ud.equals("footR") && chipR!= null){
+    				climber.grabHold(chipR, (Body) face.getUserData(), physicsWorld);
     			}
     		} else if (this.mouseJointActive == null) {
-    			if(ud.equals("lowerArmL")){
+    				   if(ud.equals("lowerArmL")){
     				climber.flex(limb.LARM_UP);
     			} else if(ud.equals("lowerArmR")){
     				climber.flex(limb.RARM_UP);
@@ -275,13 +284,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener, IOnAr
     			} else if(ud.equals("lowerLegR")){
     				climber.flex(limb.RLEG_UP);
     			} else if(ud.equals("upperArmL")){
-    				climber.relax(limb.LARM_LOW);
+    				climber.stretch(limb.LARM_LOW);
     			} else if(ud.equals("upperArmR")){
-    				climber.relax(limb.RARM_LOW);
+    				climber.stretch(limb.RARM_LOW);
     			} else if(ud.equals("upperLegL")){
-    				climber.relax(limb.LLEG_LOW);
+    				climber.stretch(limb.LLEG_LOW);
     			} else if(ud.equals("upperLegR")){
-    				climber.relax(limb.RLEG_LOW);
+    				climber.stretch(limb.RLEG_LOW);
     			}
     		}
     	}

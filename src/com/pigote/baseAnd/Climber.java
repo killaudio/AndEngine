@@ -38,6 +38,8 @@ public class Climber {
 
 	private RevoluteJoint handLJ;
 	private RevoluteJoint handRJ;
+	private RevoluteJoint footLJ;
+	private RevoluteJoint footRJ;
 	
 	private RevoluteJoint elbowL;
 	private RevoluteJoint elbowR;
@@ -276,7 +278,7 @@ public class Climber {
 		m_FootLeftSprite.setPosition(px - (m_UpperLegLeftSprite.getWidth()/2 + m_FootLeftSprite.getWidth()/2 - ANKLE_WIDTH),
 				py - (m_HeadSprite.getHeight()/2 + m_UpperTorsoSprite.getHeight() + m_LowerTorsoSprite.getHeight()/2 + m_UpperLegLeftSprite.getHeight() + m_LowerLegLeftSprite.getHeight() + m_FootLeftSprite.getHeight()/2));
 		Body footL = PhysicsFactory.createBoxBody(m_PhysicsWorld, m_FootLeftSprite, BodyType.DynamicBody, fixtureDef);
-		footL.setUserData("foot");
+		footL.setUserData("footL");
 		m_FootLeftSprite.setUserData(footL);
 		m_PhysicsWorld.registerPhysicsConnector(new PhysicsConnector(m_FootLeftSprite, footL));
 
@@ -284,7 +286,7 @@ public class Climber {
 		m_FootRightSprite.setPosition(px + m_UpperLegRightSprite.getWidth()/2 + m_FootRightSprite.getWidth()/2 - ANKLE_WIDTH, 
 				py - (m_HeadSprite.getHeight()/2 + m_UpperTorsoSprite.getHeight() + m_LowerTorsoSprite.getHeight()/2 + m_UpperLegRightSprite.getHeight() + m_LowerLegRightSprite.getHeight() + m_FootRightSprite.getHeight()/2));
 		Body footR = PhysicsFactory.createBoxBody(m_PhysicsWorld, m_FootRightSprite, BodyType.DynamicBody, fixtureDef);
-		footR.setUserData("foot");
+		footR.setUserData("footR");
 		m_FootRightSprite.setUserData(footR);
 		m_PhysicsWorld.registerPhysicsConnector(new PhysicsConnector(m_FootRightSprite, footR));
 
@@ -379,26 +381,34 @@ public class Climber {
 		m_PhysicsWorld.createJoint(jd);
 	}
 	
-	public void grabHold(Body bodyB, Body hand, PhysicsWorld m_PhysicsWorld){
+	public void grabHold(Body bodyB, Body limb, PhysicsWorld m_PhysicsWorld){
 		RevoluteJointDef jd = new RevoluteJointDef();
 		jd.enableLimit = true;
 		jd.lowerAngle = (float) (0 / (180 / Math.PI));
 		jd.upperAngle = (float) (0 / (180 / Math.PI));
-		jd.initialize(hand, bodyB, hand.getWorldPoint(bodyB.getPosition()));
-		if(hand.getUserData().equals("handL")){
+		limb.setTransform(bodyB.getPosition(), limb.getAngle());
+		jd.initialize(limb, bodyB, limb.getWorldPoint(bodyB.getPosition()));
+		if(limb.getUserData().equals("handL")){
 			handLJ = (RevoluteJoint) m_PhysicsWorld.createJoint(jd);
-		} else if(hand.getUserData().equals("handR")){
+		} else if(limb.getUserData().equals("handR")){
 			handRJ = (RevoluteJoint) m_PhysicsWorld.createJoint(jd);
+		} else if(limb.getUserData().equals("footL")){
+			footLJ = (RevoluteJoint) m_PhysicsWorld.createJoint(jd);
+		} else if(limb.getUserData().equals("footR")){
+			footRJ = (RevoluteJoint) m_PhysicsWorld.createJoint(jd);
 		}
-			
 	}
 
 	public void releaseHold(Body hand, PhysicsWorld physicsWorld) {
 		if (hand.getJointList().size() > 1) {
 			if(hand.getUserData().equals("handL")){
 				physicsWorld.destroyJoint(handLJ);
+				relax(0);
+				handLJ = null;
 			} else if(hand.getUserData().equals("handR")){
+				relax(1);
 				physicsWorld.destroyJoint(handRJ);
+				handRJ = null;
 			}
 		}
 		
@@ -409,27 +419,27 @@ public class Climber {
 		final float torque = 400;
 		switch (myLimb) {
 		case LARM_UP : 
-			elbowL.setMaxMotorTorque(torque);
-			if (!elbowL.isMotorEnabled())
-				elbowL.setMotorSpeed(speed); else	elbowL.setMotorSpeed(-elbowL.getMotorSpeed());
-			elbowL.enableMotor(true);
+			if (handLJ != null){
+				elbowL.setMaxMotorTorque(torque);
+				elbowL.setMotorSpeed(-speed);
+				elbowL.enableMotor(true);
+			}
 			break;
-		case RARM_UP : 
-			elbowR.setMaxMotorTorque(torque);
-			if (!elbowR.isMotorEnabled())
-				elbowR.setMotorSpeed(speed); else	elbowR.setMotorSpeed(-elbowR.getMotorSpeed());
-			elbowR.enableMotor(true);
+		case RARM_UP :
+			if (handRJ != null){
+				elbowR.setMaxMotorTorque(torque);
+				elbowR.setMotorSpeed(speed);
+				elbowR.enableMotor(true);
+			}
 			break;
 		case LLEG_UP : 
 			kneeL.setMaxMotorTorque(torque);
-			if (!kneeL.isMotorEnabled())
-				kneeL.setMotorSpeed(speed); else	kneeL.setMotorSpeed(-kneeL.getMotorSpeed());
+			kneeL.setMotorSpeed(speed);
 			kneeL.enableMotor(true);
 			break;
 		case RLEG_UP : 
 			kneeR.setMaxMotorTorque(torque);
-			if (!kneeR.isMotorEnabled())
-				kneeR.setMotorSpeed(speed); else	kneeR.setMotorSpeed(-kneeR.getMotorSpeed());
+			kneeR.setMotorSpeed(-speed);
 			kneeR.enableMotor(true);
 			break;
 		default:
@@ -438,44 +448,50 @@ public class Climber {
 	}
 	
 	public void stretch(limb myLimb) {
+		final float speed = 5;
+		final float torque = 400;
 		switch (myLimb) {
 		case LARM_LOW : 
-			elbowL.setMaxMotorTorque(800);
-			elbowL.setMotorSpeed(100);
-			elbowL.enableMotor(!elbowL.isMotorEnabled());
+			if (handLJ != null) {
+				elbowL.setMaxMotorTorque(torque);
+				elbowL.setMotorSpeed(speed);
+				elbowL.enableMotor(true);
+			}
 			break;
 		case RARM_LOW : 
-			elbowR.setMaxMotorTorque(800);
-			elbowR.setMotorSpeed(-100);
-			elbowR.enableMotor(!elbowR.isMotorEnabled());
+			if (handRJ != null) {
+				elbowR.setMaxMotorTorque(torque);
+				elbowR.setMotorSpeed(-speed);
+				elbowR.enableMotor(true);
+			}
 			break;
 		case LLEG_LOW : 
-			kneeL.setMaxMotorTorque(800);
-			kneeL.setMotorSpeed(-100);
-			kneeL.enableMotor(!kneeL.isMotorEnabled());
+			kneeL.setMaxMotorTorque(torque);
+			kneeL.setMotorSpeed(-speed);
+			kneeL.enableMotor(true);
 			break;
 		case RLEG_LOW : 
-			kneeR.setMaxMotorTorque(800);
-			kneeR.setMotorSpeed(100);
-			kneeR.enableMotor(!kneeR.isMotorEnabled());
+			kneeR.setMaxMotorTorque(torque);
+			kneeR.setMotorSpeed(speed);
+			kneeR.enableMotor(true);
 			break;
 		default:
 			break;
 		}
 	}
 
-	public void relax(limb myLimb) {
-		switch (myLimb) {
-		case LARM_LOW : 
+	public void relax(int quadrant) {
+		switch (quadrant) {
+		case 0 : //upper left quadrant 
 			elbowL.enableMotor(false);
 			break;
-		case RARM_LOW : 
+		case 1 : //upper right quadrant
 			elbowR.enableMotor(false);
 			break;
-		case LLEG_LOW : 
+		case 2 : //lower left quadrant
 			kneeL.enableMotor(false);
 			break;
-		case RLEG_LOW : 
+		case 3 : //lower right quadrant
 			kneeR.enableMotor(false);
 			break;
 		default:

@@ -24,7 +24,7 @@ public abstract class BaseScene extends Scene
     
     //TODO get screen width and height
 	protected static final int CAMERA_WIDTH = 540; 
-    protected static final int CAMERA_HEIGHT = 900; //900 for emu
+    protected static final int CAMERA_HEIGHT = 960; //900 for emu, 960 for atrix4g
     
     //---------------------------------------------
     // CONSTRUCTOR
